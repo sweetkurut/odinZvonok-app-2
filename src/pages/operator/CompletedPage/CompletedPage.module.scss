@@ -1,0 +1,165 @@
+.completedPage {
+  min-height: 100vh;
+  padding-bottom: 80px;
+}
+
+.header {
+  background: #4caf50;
+  color: white;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  
+  h1 {
+    font-size: 18px;
+    font-weight: 600;
+    flex: 1;
+  }
+}
+
+.backButton {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.statusIcon {
+  color: white;
+}
+
+.main {
+  padding: 20px;
+}
+
+.completedCard {
+  margin-bottom: 20px;
+}
+
+.statusBadge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #e8f5e8;
+  color: #4caf50;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-flex;
+  margin-bottom: 16px;
+}
+
+.completedCard h2 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--tg-theme-text-color);
+}
+
+.description {
+  font-size: 14px;
+  color: #4caf50;
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+
+.masterInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  
+  .label {
+    color: var(--tg-theme-hint-color);
+  }
+  
+  span:last-child {
+    font-weight: 500;
+  }
+}
+
+.completionDetails {
+  margin-bottom: 16px;
+}
+
+.detail {
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: var(--tg-theme-hint-color);
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.orderImage {
+  margin: 16px 0;
+  border-radius: 8px;
+  overflow: hidden;
+  
+  img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+  }
+}
+
+.completionInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  
+  .detail {
+    display: flex;
+    justify-content: space-between;
+    
+    span:first-child {
+      color: var(--tg-theme-hint-color);
+    }
+    
+    span:last-child {
+      font-weight: 500;
+      color: var(--tg-theme-text-color);
+    }
+  }
+}
+
+.ratingCard {
+  margin-bottom: 20px;
+  
+  h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+}
+
+.rating {
+  margin-bottom: 12px;
+}
+
+.stars {
+  display: flex;
+  gap: 4px;
+}
+
+.star {
+  color: #ffa500;
+  fill: #ffa500;
+}
+
+.reviewText {
+  font-size: 14px;
+  color: var(--tg-theme-hint-color);
+  line-height: 1.5;
+  font-style: italic;
+}

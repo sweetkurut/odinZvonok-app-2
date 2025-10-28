@@ -1,0 +1,1 @@
+export { CreateOrderPage as ClientCreateOrderPage } from './CreateOrderPage';

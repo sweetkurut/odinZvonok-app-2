@@ -1,0 +1,124 @@
+.homePage {
+    min-height: 100vh;
+    padding-bottom: 80px;
+}
+
+.header {
+    color: #333;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #0000001f;
+    text-align: center;
+
+    h1 {
+        font-size: 20px;
+        font-weight: 600;
+    }
+}
+
+.userInfo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.userName {
+    font-weight: 500;
+    // margin-left: auto;
+}
+
+.main {
+    padding: 0 20px;
+}
+
+.heroSection {
+    position: relative;
+    margin: 20px 0;
+    border-radius: 16px;
+    overflow: hidden;
+    height: 280px;
+}
+
+.heroImage {
+    width: 100%;
+    height: 150%;
+    object-fit: cover;
+    display: flex;
+}
+
+.heroContent {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+    padding: 40px 20px 20px;
+    color: white;
+}
+
+.heroTitle {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.heroDescription {
+    font-size: 14px;
+    line-height: 1.4;
+    opacity: 0.9;
+}
+
+.quickActions {
+    display: flex;
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.createOrderBtn {
+    flex: 2;
+}
+
+.quickActions .button {
+    flex: 1;
+}
+
+.sectionTitle {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 24px 0 16px;
+}
+
+.servicesList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.serviceCard {
+    h3 {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 4px;
+        color: var(--tg-theme-text-color);
+    }
+
+    p {
+        font-size: 14px;
+        color: var(--tg-theme-hint-color);
+        line-height: 1.4;
+    }
+}

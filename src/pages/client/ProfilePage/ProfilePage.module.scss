@@ -1,0 +1,162 @@
+.profilePage {
+    min-height: 100vh;
+    padding-bottom: 80px;
+}
+
+.header {
+    color: #333;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #0000001f;
+    // text-align: center;
+
+    h1 {
+        font-size: 20px;
+        font-weight: 600;
+    }
+}
+
+.main {
+    padding: 20px;
+}
+
+.userCard {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.userAvatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--tg-theme-secondary-bg-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--tg-theme-hint-color);
+}
+
+.userInfo {
+    flex: 1;
+
+    h2 {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+}
+
+.userRole {
+    color: var(--tg-theme-hint-color);
+    font-size: 14px;
+}
+
+.contactSection,
+.preferencesSection {
+    margin-bottom: 24px;
+
+    h3 {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 12px;
+        color: var(--tg-theme-text-color);
+    }
+}
+
+.contactCard {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.contactIcon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--tg-theme-secondary-bg-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--tg-theme-hint-color);
+}
+
+.contactInfo {
+    flex: 1;
+
+    label {
+        font-size: 12px;
+        color: var(--tg-theme-hint-color);
+        display: block;
+        margin-bottom: 2px;
+    }
+
+    span {
+        font-size: 16px;
+        color: var(--tg-theme-text-color);
+    }
+}
+
+.preferenceCard {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.preferenceInfo {
+    flex: 1;
+
+    span {
+        font-size: 16px;
+        color: var(--tg-theme-text-color);
+        font-weight: 500;
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    p {
+        font-size: 14px;
+        color: var(--tg-theme-hint-color);
+        margin: 0;
+    }
+}
+
+.toggle {
+    input[type="checkbox"] {
+        width: 44px;
+        height: 24px;
+        appearance: none;
+        background: #ddd;
+        border-radius: 12px;
+        position: relative;
+        cursor: pointer;
+        transition: background 0.2s;
+
+        &:checked {
+            background: var(--tg-theme-button-color);
+        }
+
+        &::after {
+            content: "";
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: white;
+            transition: transform 0.2s;
+        }
+
+        &:checked::after {
+            transform: translateX(20px);
+        }
+    }
+}
+
+.actions {
+    margin-top: 40px;
+}

@@ -1,0 +1,153 @@
+.createOrderPage {
+    min-height: 100vh;
+    padding-bottom: 80px;
+}
+
+.header {
+    color: #333;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #0000001f;
+    text-align: center;
+
+    h1 {
+        font-size: 20px;
+        font-weight: 600;
+    }
+}
+.main {
+    padding: 20px;
+}
+
+.formCard {
+    margin-bottom: 20px;
+}
+
+.formGroup {
+    margin-bottom: 20px;
+
+    select {
+        font-family: Montserrat;
+    }
+
+    option {
+        font-family: Montserrat;
+    }
+
+    label {
+        font-family: Montserrat;
+        display: block;
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 8px;
+        color: var(--tg-theme-text-color);
+    }
+
+    input,
+    select,
+    textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 16px;
+        background: white;
+
+        &:focus {
+            outline: none;
+            border-color: var(--tg-theme-button-color);
+            box-shadow: 0 0 0 2px rgba(0, 136, 204, 0.2);
+        }
+    }
+
+    textarea {
+        resize: vertical;
+        font-family: inherit;
+    }
+}
+
+.addressInput {
+    display: flex;
+    gap: 8px;
+
+    input {
+        flex: 1;
+    }
+}
+
+.mapButton {
+    width: 44px;
+    height: 44px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--tg-theme-button-color);
+
+    &:hover {
+        background: #f5f5f5;
+    }
+}
+
+.photoUpload {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.uploadButton {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 20px;
+    border: 2px dashed #ddd;
+    border-radius: 8px;
+    background: none;
+    cursor: pointer;
+    color: var(--tg-theme-hint-color);
+    min-width: 100px;
+
+    &:hover {
+        border-color: var(--tg-theme-button-color);
+        color: var(--tg-theme-button-color);
+    }
+
+    span {
+        font-size: 12px;
+    }
+}
+
+.timeOptions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.timeOption {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+
+    input[type="radio"] {
+        width: auto;
+        margin: 0;
+    }
+
+    span {
+        font-size: 14px;
+    }
+}
+
+.submitSection {
+    position: sticky;
+    bottom: 80px;
+    background: white;
+    padding: 16px 0;
+}

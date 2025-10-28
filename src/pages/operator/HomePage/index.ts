@@ -1,0 +1,1 @@
+export { HomePage as OperatorHomePage } from './HomePage';

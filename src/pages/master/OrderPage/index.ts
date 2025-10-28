@@ -1,0 +1,1 @@
+export { OrderPage as MasterOrderPage } from './OrderPage';

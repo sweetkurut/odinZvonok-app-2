@@ -1,0 +1,1 @@
+export { TariffPage as ClientTariffPage } from './TariffPage';

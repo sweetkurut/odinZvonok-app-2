@@ -1,0 +1,1 @@
+export { MasterPage as OperatorMasterPage } from './MasterPage';

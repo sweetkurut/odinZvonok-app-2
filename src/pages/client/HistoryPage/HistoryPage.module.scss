@@ -1,0 +1,94 @@
+.historyPage {
+    min-height: 100vh;
+    padding-bottom: 80px;
+}
+
+.header {
+    color: #333;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #0000001f;
+    text-align: center;
+
+    h1 {
+        font-size: 20px;
+        font-weight: 600;
+    }
+}
+
+.main {
+    padding: 20px;
+}
+
+.emptyState {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--tg-theme-hint-color);
+}
+
+.ordersList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.orderCard {
+    .orderHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 8px;
+
+        h3 {
+            font-size: 16px;
+            font-weight: 600;
+            flex: 1;
+            margin-right: 12px;
+        }
+    }
+
+    .orderStatus {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        font-weight: 500;
+
+        .statusCompleted {
+            color: #4caf50;
+        }
+
+        .statusCancelled {
+            color: #f44336;
+        }
+
+        .statusPending {
+            color: #ff9800;
+        }
+    }
+
+    .orderDescription {
+        font-size: 14px;
+        color: var(--tg-theme-hint-color);
+        line-height: 1.4;
+        margin-bottom: 12px;
+    }
+
+    .orderFooter {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 14px;
+
+        .orderDate {
+            color: var(--tg-theme-hint-color);
+        }
+
+        .orderPrice {
+            font-weight: 600;
+            color: var(--tg-theme-button-color);
+        }
+    }
+}

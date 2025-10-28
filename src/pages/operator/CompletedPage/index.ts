@@ -1,0 +1,1 @@
+export { CompletedPage as OperatorCompletedPage } from './CompletedPage';
