@@ -45,7 +45,7 @@ export const ProfilePage = () => {
                         </div>
                         <div className={styles.contactInfo}>
                             <label>Телефон</label>
-                            <span>+7 (999) 123-45-67</span>
+                            <span>+996(552)XXX-XXX</span>
                         </div>
                     </Card>
 
@@ -55,7 +55,7 @@ export const ProfilePage = () => {
                         </div>
                         <div className={styles.contactInfo}>
                             <label>Email</label>
-                            <span>vladimir@example.com</span>
+                            <span>ivanov@example.com</span>
                         </div>
                     </Card>
                 </section>

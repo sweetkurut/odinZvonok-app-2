@@ -1,1 +1,1 @@
-export { MasterPage as OperatorMasterPage } from './MasterPage';
+export { MasterPage as OperatorMasterPage } from "./MasterPage";

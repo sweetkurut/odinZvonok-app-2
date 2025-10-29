@@ -1,158 +1,158 @@
 .masterPage {
-  min-height: 100vh;
-  padding-bottom: 80px;
+    min-height: 100vh;
+    padding-bottom: 80px;
 }
 
 .header {
-  background: var(--tg-theme-button-color);
-  color: white;
-  padding: 16px 20px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  
-  h1 {
-    font-size: 18px;
-    font-weight: 600;
-  }
+    background: var(--tg-theme-button-color);
+    color: white;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    h1 {
+        font-size: 18px;
+        font-weight: 600;
+    }
 }
 
 .backButton {
-  background: none;
-  border: none;
-  color: white;
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  
-  &:hover {
-    background: rgba(255, 255, 255, 0.1);
-  }
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
 }
 
 .main {
-  padding: 20px;
+    padding: 20px;
 }
 
 .masterProfile {
-  margin-bottom: 20px;
+    margin-bottom: 20px;
 }
 
 .masterInfo {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
 }
 
 .masterAvatar {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: var(--tg-theme-button-color);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: 18px;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--tg-theme-button-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 18px;
 }
 
 .masterDetails {
-  flex: 1;
-  
-  h2 {
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 8px;
-  }
+    flex: 1;
+
+    h2 {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
 }
 
 .masterRating {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
 }
 
 .stars {
-  display: flex;
-  gap: 2px;
+    display: flex;
+    gap: 2px;
 }
 
 .star {
-  color: #ffa500;
-  fill: #ffa500;
+    color: #ffa500;
+    fill: #ffa500;
 }
 
 .masterCategories {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
 .category {
-  background: var(--tg-theme-secondary-bg-color);
-  color: var(--tg-theme-hint-color);
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 12px;
+    background: var(--tg-theme-secondary-bg-color);
+    color: var(--tg-theme-hint-color);
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
 }
 
 .orderDetails {
-  margin-bottom: 20px;
-  
-  h3 {
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 16px;
-  }
+    margin-bottom: 20px;
+
+    h3 {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 16px;
+    }
 }
 
 .orderInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
 .detail {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  font-size: 14px;
-  
-  span:first-child {
-    color: var(--tg-theme-hint-color);
-    min-width: 80px;
-  }
-  
-  span:last-child {
-    font-weight: 500;
-    color: var(--tg-theme-text-color);
-    text-align: right;
-    flex: 1;
-  }
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    font-size: 14px;
+
+    span:first-child {
+        color: var(--tg-theme-hint-color);
+        min-width: 80px;
+    }
+
+    span:last-child {
+        font-weight: 500;
+        color: var(--tg-theme-text-color);
+        text-align: right;
+        flex: 1;
+    }
 }
 
 .assignmentCard {
-  h3 {
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 8px;
-  }
-  
-  p {
-    font-size: 14px;
-    color: var(--tg-theme-hint-color);
-    margin-bottom: 20px;
-    line-height: 1.5;
-  }
+    h3 {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    p {
+        font-size: 14px;
+        color: var(--tg-theme-hint-color);
+        margin-bottom: 20px;
+        line-height: 1.5;
+    }
 }
 
 .actions {
-  display: flex;
-  gap: 12px;
-  
-  .button {
-    flex: 1;
-  }
+    display: flex;
+    gap: 12px;
+
+    .button {
+        flex: 1;
+    }
 }
