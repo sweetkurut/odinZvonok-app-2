@@ -13,7 +13,6 @@ export const CreateOrderPage = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // Here would be the logic to create order
         navigate("/client");
     };
 
@@ -83,32 +82,10 @@ export const CreateOrderPage = () => {
                                 </button>
                             </div>
                         </div>
-
-                        <div className={styles.formGroup}>
-                            <label>Желаемое время</label>
-                            <div className={styles.timeOptions}>
-                                <label className={styles.timeOption}>
-                                    <input type="radio" name="time" value="asap" defaultChecked />
-                                    <span>Как можно скорее</span>
-                                </label>
-                                <label className={styles.timeOption}>
-                                    <input type="radio" name="time" value="today" />
-                                    <span>Сегодня</span>
-                                </label>
-                                <label className={styles.timeOption}>
-                                    <input type="radio" name="time" value="tomorrow" />
-                                    <span>Завтра</span>
-                                </label>
-                                <label className={styles.timeOption}>
-                                    <input type="radio" name="time" value="specific" />
-                                    <span>Выбрать время</span>
-                                </label>
-                            </div>
-                        </div>
                     </Card>
 
                     <div className={styles.submitSection}>
-                        <Button type="submit" variant="primary" size="large">
+                        <Button type="submit" variant="primary" size="medium" className={styles.button}>
                             Создать заказ
                         </Button>
                     </div>
