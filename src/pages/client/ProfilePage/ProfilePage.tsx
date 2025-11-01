@@ -10,6 +10,7 @@ export const ProfilePage = () => {
     // const user = useSelector((state: RootState) => state.user.currentUser);
 
     return (
+        
         <div className={styles.profilePage}>
             <header className={styles.header}>
                 <div className={styles.userInfo}>

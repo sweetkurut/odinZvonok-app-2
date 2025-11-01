@@ -1,1 +1,23 @@
-export const storesApi = {};
+import type { PageResponse } from "@/store/types";
+import instance from "./axiosInstance";
+
+export const storesApi = {
+    // получение списка всех заказов (клиент)
+    getAllOrders(
+        params: {
+            page?: number;
+            size?: number;
+            sort?: string;
+        } = {}
+    ) {
+        const { page = 0, size = 10, sort = "created_at,desc" } = params;
+
+        return instance.get<PageResponse>("/orders/my", {
+            params: {
+                page,
+                size,
+                sort,
+            },
+        });
+    },
+};
