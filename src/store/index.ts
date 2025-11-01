@@ -1,12 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { userSlice } from "../entities/user";
-import { orderSlice } from "../entities/order";
 
 export const store = configureStore({
-    reducer: {
-        user: userSlice.reducer,
-        order: orderSlice.reducer,
-    },
+    reducer: {},
+    middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware({
+            serializableCheck: false,
+        }),
+    devTools: false,
 });
 
 export type RootState = ReturnType<typeof store.getState>;

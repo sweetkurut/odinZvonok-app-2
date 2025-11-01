@@ -1,6 +1,5 @@
 import { Navigation, Card, Button } from "../../../shared/ui";
-import { useSelector } from "react-redux";
-import { RootState } from "../../../app/store";
+// import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./HomePage.module.scss";
 
@@ -8,7 +7,7 @@ import Img from "../../../assets/Rectangle 1.png";
 import Logo from "../../../assets/Logo.png";
 
 export const HomePage = () => {
-    const user = useSelector((state: RootState) => state.user.currentUser);
+    // const user = useSelector((state: RootState) => state.user.currentUser);
     const navigate = useNavigate();
 
     return (
@@ -20,7 +19,8 @@ export const HomePage = () => {
                     </Link>
                 </div>
                 <div>
-                    <h1 className={styles.userName}>{user?.name}</h1>
+                    {/* <h1 className={styles.userName}>{user?.name}</h1> */}
+                    <h1 className={styles.userName}>Пользователь</h1>
                 </div>
             </header>
 

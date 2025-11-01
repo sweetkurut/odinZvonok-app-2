@@ -1,13 +1,13 @@
 import { Navigation, Card } from "../../../shared/ui";
-import { useSelector } from "react-redux";
-import { RootState } from "../../../app/store";
+// import { useSelector } from "react-redux";
+// import { RootState } from "../../../store";
 import { Clock, CheckCircle, XCircle } from "lucide-react";
 import styles from "./HistoryPage.module.scss";
 import Logo from "../../../assets/Logo.png";
 import { Link } from "react-router-dom";
 
 export const HistoryPage = () => {
-    const orders = useSelector((state: RootState) => state.order.orders);
+    // const orders = useSelector((state: RootState) => state.order.orders);
 
     const getStatusIcon = (status: string) => {
         switch (status) {
@@ -42,7 +42,7 @@ export const HistoryPage = () => {
                 <h1>История сделок</h1>
             </header>
 
-            <main className={styles.main}>
+            {/* <main className={styles.main}>
                 {orders.length === 0 ? (
                     <div className={styles.emptyState}>
                         <p>У вас пока нет заказов</p>
@@ -71,7 +71,7 @@ export const HistoryPage = () => {
                         ))}
                     </div>
                 )}
-            </main>
+            </main> */}
 
             <Navigation role="client" />
         </div>

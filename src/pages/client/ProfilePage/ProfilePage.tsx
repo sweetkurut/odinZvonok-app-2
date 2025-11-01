@@ -1,13 +1,13 @@
 import { Navigation, Card, Button } from "../../../shared/ui";
-import { useSelector } from "react-redux";
-import { RootState } from "../../../app/store";
+// import { useSelector } from "react-redux";
+// import { RootState } from "../../../store";
 import { User, Phone, Mail, CreditCard as Edit } from "lucide-react";
 import styles from "./ProfilePage.module.scss";
 import Logo from "../../../assets/Logo.png";
 import { Link } from "react-router-dom";
 
 export const ProfilePage = () => {
-    const user = useSelector((state: RootState) => state.user.currentUser);
+    // const user = useSelector((state: RootState) => state.user.currentUser);
 
     return (
         <div className={styles.profilePage}>
@@ -28,7 +28,7 @@ export const ProfilePage = () => {
                         <User size={40} />
                     </div>
                     <div className={styles.userInfo}>
-                        <h2>{user?.name || "Владимир Иван Осипов"}</h2>
+                        <h2>{"Владимир Иван Осипов"}</h2>
                         <p className={styles.userRole}>Клиент</p>
                     </div>
                     <Button variant="secondary" size="small">
