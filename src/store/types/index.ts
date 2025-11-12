@@ -27,12 +27,12 @@ export interface ServiceRequest {
     title: string;
     description: string;
     address: string;
-    status: "PENDING_ASSIGNMENT" | string; // можно расширить другими возможными статусами
+    status: "PENDING_ASSIGNMENT" | string;
     imageUrls: string[];
     client: User;
     master: User;
-    created_at: string; // или Date если будет преобразование
-    completed_at: string; // или Date если будет преобразование
+    created_at: string;
+    completed_at: string;
 }
 
 export interface Orders {
