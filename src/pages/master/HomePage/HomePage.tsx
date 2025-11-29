@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Navigation, Card, Button } from '../../../shared/ui';
-import { User, ToggleLeft, ToggleRight } from 'lucide-react';
+import { User } from 'lucide-react';
 import styles from './HomePage.module.scss';
 
 export const HomePage = () => {

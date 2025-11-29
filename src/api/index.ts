@@ -1,4 +1,4 @@
-import type { PageResponse } from "@/store/types";
+import type { CreateOrder, Orders, PageResponse } from "@/store/types";
 import instance from "./axiosInstance";
 
 export const storesApi = {
@@ -12,7 +12,7 @@ export const storesApi = {
     ) {
         const { page = 0, size = 10, sort = "created_at,desc" } = params;
 
-        return instance.get<PageResponse>("/orders/my", {
+        return instance.get<Orders>("/orders/my", {
             params: {
                 page,
                 size,
@@ -20,4 +20,8 @@ export const storesApi = {
             },
         });
     },
+
+    createOrder(orderData: CreateOrder) {
+    return instance.post<Orders>('/orders', orderData); // важно указать тип ответа
+    }
 };

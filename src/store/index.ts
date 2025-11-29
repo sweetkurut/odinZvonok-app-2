@@ -1,7 +1,10 @@
 import { configureStore } from "@reduxjs/toolkit";
+import OrderSlice from './slices/orderSlice'
 
 export const store = configureStore({
-    reducer: {},
+    reducer: {
+        orders: OrderSlice
+    },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
             serializableCheck: false,

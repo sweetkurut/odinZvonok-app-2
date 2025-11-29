@@ -48,3 +48,12 @@ export interface Orders {
     last: boolean;
     empty: boolean;
 }
+
+
+export interface CreateOrder {
+    category: string,
+    title: string,
+    description: string
+    address: string,
+    imageUrls: string[]
+}
