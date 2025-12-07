@@ -1,13 +1,21 @@
 import { Navigation, Card } from "../../../shared/ui";
-// import { useSelector } from "react-redux";
 // import { RootState } from "../../../store";
 import { Clock, CheckCircle, XCircle } from "lucide-react";
 import styles from "./HistoryPage.module.scss";
 import Logo from "../../../assets/Logo.png";
 import { Link } from "react-router-dom";
+import type { RootState } from "@/store";
+import { useAppDispatch, useAppSelector } from "@/shared/hooks";
+import { useEffect } from "react";
+import { fetchOrders } from "@/store/slices/orderSlice";
 
 export const HistoryPage = () => {
-    // const orders = useSelector((state: RootState) => state.order.orders);
+    const orders = useAppSelector((state: RootState) => state.orders);
+    const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        dispatch(fetchOrders());
+    }, [dispatch]);
 
     const getStatusIcon = (status: string) => {
         switch (status) {
@@ -42,14 +50,14 @@ export const HistoryPage = () => {
                 <h1>История сделок</h1>
             </header>
 
-            {/* <main className={styles.main}>
-                {orders.length === 0 ? (
+            <main className={styles.main}>
+                {orders?.length === 0 ? (
                     <div className={styles.emptyState}>
                         <p>У вас пока нет заказов</p>
                     </div>
                 ) : (
                     <div className={styles.ordersList}>
-                        {orders.map((order) => (
+                        {orders?.map((order) => (
                             <Card key={order.id} className={styles.orderCard}>
                                 <div className={styles.orderHeader}>
                                     <h3>{order.title}</h3>
@@ -71,7 +79,7 @@ export const HistoryPage = () => {
                         ))}
                     </div>
                 )}
-            </main> */}
+            </main>
 
             <Navigation role="client" />
         </div>

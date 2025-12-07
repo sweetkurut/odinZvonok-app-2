@@ -2,12 +2,10 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { storesApi } from "@/api";
 import type { CreateOrder, Orders } from "../types";
 
-
-
 // Расширяем состояние — добавляем флаги для создания заказа
 type OrdersState = {
     loading: boolean;
-    creating: boolean;        // новый флаг
+    creating: boolean; // новый флаг
     error: null | string;
     createError: null | string; // отдельная ошибка для создания
     orders: Orders[] | null;
@@ -22,8 +20,8 @@ const initialState: OrdersState = {
 };
 
 // Получение списка заказов
-export const fetchListOrders = createAsyncThunk<Orders[], void, { rejectValue: string }>(
-    "orders/fetchListOrders",
+export const fetchOrders = createAsyncThunk<Orders[], void, { rejectValue: string }>(
+    "orders/fetchOrders",
     async (_, { rejectWithValue }) => {
         try {
             const res = await storesApi.getAllOrders();
@@ -32,7 +30,7 @@ export const fetchListOrders = createAsyncThunk<Orders[], void, { rejectValue: s
             }
             return res.data as Orders[];
         } catch (error: any) {
-            console.error("fetchListOrders error:", error);
+            console.error("fetchOrders error:", error);
             return rejectWithValue(error?.message || "Неизвестная ошибка при загрузке заказов");
         }
     }
@@ -40,27 +38,24 @@ export const fetchListOrders = createAsyncThunk<Orders[], void, { rejectValue: s
 
 // Создание нового заказа
 export const createOrder = createAsyncThunk<
-    Orders,                    // возвращаем созданный заказ
-    CreateOrder,               // аргумент — тело запроса
+    Orders, // возвращаем созданный заказ
+    CreateOrder, // аргумент — тело запроса
     { rejectValue: string }
->(
-    "orders/createOrder",
-    async (orderData, { rejectWithValue }) => {
-        try {
-            const res = await storesApi.createOrder(orderData);
-            
-            if (res.status !== 200 && res.status !== 201) {
-                return rejectWithValue(`Ошибка сервера: ${res.status}`);
-            }
+>("orders/createOrder", async (orderData, { rejectWithValue }) => {
+    try {
+        const res = await storesApi.createOrder(orderData);
 
-            return res.data as Orders; // предполагаем, что сервер возвращает созданный заказ
-        } catch (error: any) {
-            console.error("createOrder error:", error);
-            const message = error?.response?.data?.message || error?.message || "Ошибка создания заказа";
-            return rejectWithValue(message);
+        if (res.status !== 200 && res.status !== 201) {
+            return rejectWithValue(`Ошибка сервера: ${res.status}`);
         }
+
+        return res.data as Orders; // предполагаем, что сервер возвращает созданный заказ
+    } catch (error: any) {
+        console.error("createOrder error:", error);
+        const message = error?.response?.data?.message || error?.message || "Ошибка создания заказа";
+        return rejectWithValue(message);
     }
-);
+});
 
 const ordersSlice = createSlice({
     name: "orders",
@@ -74,15 +69,15 @@ const ordersSlice = createSlice({
     extraReducers: (builder) => {
         builder
             // === fetchListOrders ===
-            .addCase(fetchListOrders.pending, (state) => {
+            .addCase(fetchOrders.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(fetchListOrders.fulfilled, (state, action) => {
+            .addCase(fetchOrders.fulfilled, (state, action) => {
                 state.loading = false;
                 state.orders = action.payload;
             })
-            .addCase(fetchListOrders.rejected, (state, action) => {
+            .addCase(fetchOrders.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload || "Ошибка загрузки заказов";
             })
