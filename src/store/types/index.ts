@@ -49,11 +49,73 @@ export interface Orders {
     empty: boolean;
 }
 
-
 export interface CreateOrder {
-    category: string,
-    title: string,
-    description: string
-    address: string,
-    imageUrls: string[]
+    category: string;
+    title: string;
+    description: string;
+    address: string;
+    imageUrls: string[];
+}
+
+// регистрация пользователя
+// JWT
+export interface ITokens {
+    access_token: string;
+    refresh_token: string;
+}
+
+// User
+export interface IUser {
+    id: number;
+    telegram_id: number;
+    username?: string;
+    role: "client" | "operator" | "master";
+    first_name?: string;
+    last_name?: string;
+    middle_name?: string;
+    phone_number?: string;
+    email?: string;
+    address?: string;
+    profile_photo_url?: string;
+}
+
+// Responses
+export interface ITelegramAuthResponse extends ITokens {
+    user: IUser;
+}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface IAuthMeResponse extends IUser {}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface IRefreshTokenResponse extends ITokens {}
+
+// Requests
+export interface ITelegramAuthRequest {
+    init_data: string;
+}
+
+export interface IQuickRegisterRequest {
+    telegram_id: number;
+    username?: string;
+}
+
+export interface IFullRegisterRequest {
+    telegram_id: number;
+    username?: string;
+    first_name: string;
+    last_name: string;
+    middle_name?: string;
+    phone_number: string;
+    email: string;
+    address?: string;
+    profile_photo_url?: string;
+}
+
+export interface IUpdateProfileRequest {
+    first_name?: string;
+    last_name?: string;
+    middle_name?: string;
+    phone_number?: string;
+    email?: string;
+    address?: string;
+    profile_photo_url?: string;
 }

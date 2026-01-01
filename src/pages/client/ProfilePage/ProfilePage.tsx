@@ -10,7 +10,6 @@ export const ProfilePage = () => {
     // const user = useSelector((state: RootState) => state.user.currentUser);
 
     return (
-        
         <div className={styles.profilePage}>
             <header className={styles.header}>
                 <div className={styles.userInfo}>
@@ -56,7 +55,7 @@ export const ProfilePage = () => {
                         </div>
                         <div className={styles.contactInfo}>
                             <label>Email</label>
-                            <span>ivanov@example.com</span>
+                            <span>ivanov</span>
                         </div>
                     </Card>
                 </section>

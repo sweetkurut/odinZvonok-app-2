@@ -12,10 +12,14 @@ import { OperatorCompletedPage } from "../../pages/operator/CompletedPage";
 import { MasterHomePage } from "../../pages/master/HomePage";
 import { MasterHistoryPage } from "../../pages/master/HistoryPage";
 import { MasterOrderPage } from "../../pages/master/OrderPage";
+import Login from "@/pages/Login/Login";
 
 export const AppRouter = () => {
     return (
         <Routes>
+            {/* login */}
+            <Route path="/" element={<Login />} />
+
             {/* Client Routes */}
             <Route path="/" element={<ClientHomePage />} />
             <Route path="/client" element={<ClientHomePage />} />
