@@ -49,6 +49,61 @@ export interface Orders {
     empty: boolean;
 }
 
+// Пагинированный ответ от /api/orders/my
+export interface OrdersResponse {
+    content: Order[]; // ← массив заказов
+    totalPages: number;
+    totalElements: number;
+    pageable: {
+        pageNumber: number;
+        pageSize: number;
+        paged: boolean;
+        unpaged: boolean;
+        offset: number;
+        sort: SortItem[];
+    };
+    numberOfElements: number;
+    size: number;
+    number: number;
+    sort: SortItem[];
+    first: boolean;
+    last: boolean;
+    empty: boolean;
+}
+
+interface SortItem {
+    direction: string;
+    nullHandling: string;
+    ascending: boolean;
+    property: string;
+    ignoreCase: boolean;
+}
+
+// Один заказ
+export interface Order {
+    id: string;
+    category: string;
+    title: string;
+    description: string;
+    address: string;
+    status: string; // например "PENDING_ASSIGNMENT"
+    imageUrls: string[];
+    client: {
+        id: string;
+        fullName: string;
+        profile_photo_url: string;
+    };
+    master?: {
+        // может быть null
+        id: string;
+        fullName: string;
+        profile_photo_url: string;
+    };
+    created_at: string; // ISO дата
+    completed_at?: string; // может быть null
+    // price?: number;          // если есть цена — добавь
+}
+
 export interface CreateOrder {
     category: string;
     title: string;
@@ -69,7 +124,7 @@ export interface IUser {
     id: number;
     telegram_id: number;
     username?: string;
-    role: "client" | "operator" | "master";
+    role: "CLIENT" | "OPERATOR" | "MASTER";
     first_name?: string;
     last_name?: string;
     middle_name?: string;
@@ -77,6 +132,8 @@ export interface IUser {
     email?: string;
     address?: string;
     profile_photo_url?: string;
+    full_name?: string;
+    is_registration_complete: boolean;
 }
 
 // Responses

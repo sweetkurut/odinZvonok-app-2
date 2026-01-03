@@ -1,9 +1,35 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import type { IRefreshTokenResponse, ITelegramAuthResponse, IUser } from "../types";
+import type { IRefreshTokenResponse } from "../types";
 import { storesApi } from "@/api";
 
-// utils
+// Интерфейс пользователя из ответа /auth/telegram
+export interface IUser {
+    id: string;
+    telegram_id: number;
+    username?: string;
+    first_name?: string;
+    last_name?: string;
+    middle_name?: string;
+    phone_number?: string;
+    email?: string;
+    address?: string;
+    profile_photo_url?: string;
+    role: "client" | "operator" | "master";
+    is_registration_complete: boolean;
+    full_name?: string;
+}
+
+// Ответ от /auth/telegram
+interface ITelegramAuthResponse {
+    access_token: string;
+    refresh_token: string;
+    token_type: string;
+    expires_in: number;
+    user: IUser;
+}
+
+// Utils для токенов
 const saveTokens = (access: string, refresh: string) => {
     localStorage.setItem("accessToken", access);
     localStorage.setItem("refreshToken", refresh);
@@ -12,10 +38,6 @@ const saveTokens = (access: string, refresh: string) => {
 const removeTokens = () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
-};
-
-const hasTokens = () => {
-    return !!localStorage.getItem("accessToken");
 };
 
 type AuthState = {
@@ -29,13 +51,13 @@ const initialState: AuthState = {
     loading: false,
     error: null,
     user: null,
-    isAuthenticated: hasTokens(),
+    isAuthenticated: false,
 };
 
 /* ===================== THUNKS ===================== */
 
-// Telegram auth
-export const fetchTelegramAuth = createAsyncThunk<ITelegramAuthResponse, string>(
+// Основной вход через Telegram
+export const fetchTelegramAuth = createAsyncThunk<ITelegramAuthResponse, string, { rejectValue: string }>(
     "auth/telegramAuth",
     async (initData, { rejectWithValue }) => {
         try {
@@ -43,56 +65,68 @@ export const fetchTelegramAuth = createAsyncThunk<ITelegramAuthResponse, string>
             saveTokens(res.data.access_token, res.data.refresh_token);
             return res.data;
         } catch (e: any) {
-            return rejectWithValue(e.response?.data || "Telegram auth error");
+            const message = e.response?.data?.message || "Ошибка авторизации через Telegram";
+            return rejectWithValue(message);
         }
     }
 );
 
-// Get me
-export const fetchMe = createAsyncThunk<IUser>("auth/me", async (_, { rejectWithValue }) => {
-    try {
-        const res = await storesApi.getMe();
-        return res.data;
-    } catch (error: any) {
-        console.error(error);
+// Получение свежего профиля (если нужно)
+export const fetchMe = createAsyncThunk<IUser, void, { rejectValue: string }>(
+    "auth/me",
+    async (_, { rejectWithValue }) => {
+        try {
+            const res = await storesApi.getMe();
+            return res.data;
+        } catch (error: any) {
+            console.error(error);
 
-        return rejectWithValue("Не удалось получить пользователя");
+            return rejectWithValue("Не удалось загрузить профиль");
+        }
     }
-});
+);
 
-// Refresh
-export const fetchRefreshToken = createAsyncThunk<IRefreshTokenResponse>(
+// Refresh токена
+export const fetchRefreshToken = createAsyncThunk<IRefreshTokenResponse, void, { rejectValue: string }>(
     "auth/refresh",
     async (_, { rejectWithValue }) => {
         try {
             const refresh = localStorage.getItem("refreshToken");
-            if (!refresh) throw new Error();
-
+            if (!refresh) throw new Error("Нет refresh токена");
             const res = await storesApi.refreshToken(refresh);
             saveTokens(res.data.access_token, res.data.refresh_token);
             return res.data;
         } catch {
             removeTokens();
-            return rejectWithValue("Refresh token expired");
+            return rejectWithValue("Сессия истекла");
         }
     }
 );
 
 // Logout
 export const fetchLogout = createAsyncThunk("auth/logout", async () => {
-    await storesApi.logout();
-    removeTokens();
+    try {
+        await storesApi.logout();
+    } finally {
+        removeTokens();
+    }
 });
 
 /* ===================== SLICE ===================== */
-
 const authSlice = createSlice({
     name: "auth",
     initialState,
-    reducers: {},
+    reducers: {
+        clearAuth: (state) => {
+            state.user = null;
+            state.isAuthenticated = false;
+            state.error = null;
+            removeTokens();
+        },
+    },
     extraReducers: (builder) => {
         builder
-            // Telegram auth
+            // Telegram Auth
             .addCase(fetchTelegramAuth.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -104,23 +138,22 @@ const authSlice = createSlice({
             })
             .addCase(fetchTelegramAuth.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.payload as string;
+                state.error = action.payload || "Ошибка авторизации";
                 state.isAuthenticated = false;
             })
 
-            // Me
+            // fetchMe
             .addCase(fetchMe.fulfilled, (state, action) => {
                 state.user = action.payload;
                 state.isAuthenticated = true;
             })
 
-            // Refresh
+            // Refresh & Logout
             .addCase(fetchRefreshToken.rejected, (state) => {
                 state.user = null;
                 state.isAuthenticated = false;
+                removeTokens();
             })
-
-            // Logout
             .addCase(fetchLogout.fulfilled, (state) => {
                 state.user = null;
                 state.isAuthenticated = false;
@@ -128,4 +161,5 @@ const authSlice = createSlice({
     },
 });
 
+export const { clearAuth } = authSlice.actions;
 export default authSlice.reducer;

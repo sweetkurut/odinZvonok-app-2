@@ -1,7 +1,7 @@
 import axios from "axios";
 import { getAccessToken } from "@/utils/auth";
 
-export const urlApi = "https://1-zvonok.com/";
+export const urlApi = "https://1-zvonok.com/api";
 
 const instance = axios.create({
     // baseURL: urlApi + "api/",

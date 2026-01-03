@@ -22,6 +22,26 @@
     padding: 20px;
 }
 
+.avatarImage {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.noContact {
+    color: #888;
+    font-style: italic;
+    text-align: center;
+    padding: 20px;
+}
+
+.loader {
+    text-align: center;
+    padding: 40px;
+    font-size: 1.2em;
+}
+
 .userCard {
     display: flex;
     align-items: center;

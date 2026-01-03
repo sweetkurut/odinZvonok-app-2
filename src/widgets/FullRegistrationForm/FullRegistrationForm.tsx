@@ -1,16 +1,23 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { storesApi } from "@/api";
+import { useAppDispatch } from "@/store/hooks";
+import { fetchMe } from "@/store/slices/authSlice";
 import styles from "./FullRegistrationForm.module.scss";
 
 const FullRegistrationForm = () => {
     const [loading, setLoading] = useState(false);
+    const dispatch = useAppDispatch();
+    const navigate = useNavigate();
+
+    // Берём данные из Telegram, если доступны (для автозаполнения)
+    const tg = (window as any).Telegram?.WebApp;
+    const tgUser = tg?.initDataUnsafe?.user;
 
     const [form, setForm] = useState({
-        telegram_id: "",
-        username: "",
-        first_name: "",
-        last_name: "",
+        first_name: tgUser?.first_name || "",
+        last_name: tgUser?.last_name || "",
         middle_name: "",
         phone_number: "",
         email: "",
@@ -23,17 +30,15 @@ const FullRegistrationForm = () => {
     };
 
     const submit = async () => {
-        if (!form.telegram_id || !form.first_name || !form.last_name || !form.phone_number) {
-            alert("Заполните обязательные поля: Telegram ID, Имя, Фамилия, Телефон");
+        if (!form.first_name || !form.last_name || !form.phone_number) {
+            alert("Заполните обязательные поля: Имя, Фамилия, Телефон");
             return;
         }
 
         try {
             setLoading(true);
 
-            await storesApi.fullRegister({
-                telegram_id: Number(form.telegram_id),
-                username: form.username || undefined,
+            await storesApi.completeRegistration({
                 first_name: form.first_name,
                 last_name: form.last_name,
                 middle_name: form.middle_name || undefined,
@@ -43,56 +48,47 @@ const FullRegistrationForm = () => {
                 profile_photo_url: form.profile_photo_url || undefined,
             });
 
-            alert("Регистрация успешна!");
-            // Перезагружаем — Telegram снова отправит initData → авторизация пройдёт
-            window.location.href = "/";
+            // Обновляем данные пользователя
+            const updatedUser = await dispatch(fetchMe()).unwrap();
+
+            alert("Регистрация завершена!");
+
+            // Редиректим по роли
+            if (updatedUser.role === "client") {
+                navigate("/client");
+            } else if (updatedUser.role === "operator") {
+                navigate("/operator");
+            } else if (updatedUser.role === "master") {
+                navigate("/master");
+            }
         } catch (err: any) {
-            const msg = err?.response?.data?.message || "Ошибка регистрации";
+            const msg = err?.response?.data?.message || "Ошибка при сохранении данных";
             alert(msg);
         } finally {
             setLoading(false);
         }
     };
 
-    // Автозаполнение из Telegram, если доступно
-    const tg = (window as any).Telegram?.WebApp;
-    const tgUser = tg?.initDataUnsafe?.user;
-
     return (
         <div className={styles.wrapper}>
             <h1>Завершите регистрацию</h1>
             <div className={styles.card}>
-                <p>Заполните данные для входа в приложение</p>
-
-                <input
-                    name="telegram_id"
-                    type="number"
-                    placeholder="Telegram ID * (ваш числовой ID)"
-                    value={form.telegram_id || tgUser?.id || ""}
-                    onChange={handleChange}
-                    disabled={!!tgUser?.id}
-                />
-                {tgUser?.id && <p className={styles.hint}>ID взят из Telegram: {tgUser.id}</p>}
-
-                <input
-                    name="username"
-                    placeholder="Username (опционально, например: @mynick)"
-                    value={form.username || tgUser?.username || ""}
-                    onChange={handleChange}
-                />
+                <p>Заполните недостающие данные для полного доступа к приложению</p>
 
                 <input
                     name="first_name"
                     placeholder="Имя *"
-                    value={form.first_name || tgUser?.first_name || ""}
+                    value={form.first_name}
                     onChange={handleChange}
+                    required
                 />
 
                 <input
                     name="last_name"
                     placeholder="Фамилия *"
-                    value={form.last_name || tgUser?.last_name || ""}
+                    value={form.last_name}
                     onChange={handleChange}
+                    required
                 />
 
                 <input
@@ -104,9 +100,10 @@ const FullRegistrationForm = () => {
 
                 <input
                     name="phone_number"
-                    placeholder="Телефон * (+7...)"
+                    placeholder="Телефон * (+7XXXXXXXXXX)"
                     value={form.phone_number}
                     onChange={handleChange}
+                    required
                 />
 
                 <input
@@ -127,7 +124,7 @@ const FullRegistrationForm = () => {
                 />
 
                 <button onClick={submit} disabled={loading}>
-                    {loading ? "Регистрация..." : "Продолжить"}
+                    {loading ? "Сохранение..." : "Продолжить"}
                 </button>
             </div>
         </div>
