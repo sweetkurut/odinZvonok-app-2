@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { ClientHomePage } from "../../pages/client/HomePage";
 import { ClientHelpPage } from "../../pages/client/HelpPage";
 import { ClientHistoryPage } from "../../pages/client/HistoryPage";
@@ -17,11 +17,13 @@ import Login from "@/pages/Login/Login";
 export const AppRouter = () => {
     return (
         <Routes>
-            {/* login */}
-            <Route path="/" element={<Login />} />
+            {/* Default redirect */}
+            <Route path="/" element={<Navigate to="/login" replace />} />
+
+            {/* Login */}
+            <Route path="/login" element={<Login />} />
 
             {/* Client Routes */}
-            <Route path="/" element={<ClientHomePage />} />
             <Route path="/client" element={<ClientHomePage />} />
             <Route path="/client/help" element={<ClientHelpPage />} />
             <Route path="/client/history" element={<ClientHistoryPage />} />

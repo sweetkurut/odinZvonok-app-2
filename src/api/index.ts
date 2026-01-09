@@ -63,6 +63,6 @@ export const storesApi = {
     },
 
     createOrder(orderData: CreateOrder) {
-        return instance.post<Orders>("/orders", orderData); // важно указать тип ответа
+        return instance.post<Orders>("/orders", orderData);
     },
 };

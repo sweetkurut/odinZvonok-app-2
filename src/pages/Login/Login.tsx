@@ -14,16 +14,28 @@ const Login = () => {
     useEffect(() => {
         const tg = (window as any).Telegram?.WebApp;
 
-        // Локальная разработка — мок
+        // DEV MODE — мок initData
         if (import.meta.env.DEV && !tg) {
-            console.log("Локалка: Telegram WebApp не найден — пропускаем (или добавь мок)");
-            // Можно добавить мок initData здесь, если хочешь
+            console.log("DEV MODE: Telegram WebApp не найден — используем мок initData");
+
+            const mockInitData =
+                "query_id=AAH...&user=%7B%22id%22%3A123456789%2C%22first_name%22%3A%22Test%22%7D";
+
+            const initDev = async () => {
+                try {
+                    const result = await dispatch(fetchTelegramAuth(mockInitData)).unwrap();
+                    saveAndRedirect(result.user);
+                } catch (err) {
+                    console.error("Ошибка DEV auth:", err);
+                }
+            };
+            initDev();
             return;
         }
 
-        // Реальный Telegram
+        // REAL Telegram
         if (!tg?.initData) {
-            // Не в Telegram — ошибка
+            console.warn("Telegram WebApp initData не найден — открыто вне Telegram?");
             return;
         }
 
@@ -32,21 +44,8 @@ const Login = () => {
 
         const init = async () => {
             try {
-                // Один единственный запрос
                 const result = await dispatch(fetchTelegramAuth(tg.initData)).unwrap();
-
-                const currentUser = result.user;
-
-                // Проверяем, завершена ли регистрация
-                if (!currentUser.is_registration_complete) {
-                    // Нужно заполнить данные
-                    return;
-                }
-
-                // Регистрация завершена — редиректим по роли
-                if (currentUser.role === "client") navigate("/client");
-                else if (currentUser.role === "operator") navigate("/operator");
-                else if (currentUser.role === "master") navigate("/master");
+                saveAndRedirect(result.user, result.access_token, result.refresh_token);
             } catch (err) {
                 console.error("Ошибка Telegram auth:", err);
             }
@@ -54,6 +53,34 @@ const Login = () => {
 
         init();
     }, [dispatch, navigate]);
+
+    // Сохраняем токены и редиректим
+    const saveAndRedirect = (currentUser: any, accessToken?: string, refreshToken?: string) => {
+        if (!currentUser) return;
+
+        // Сохраняем токены
+        if (accessToken) localStorage.setItem("access_token", accessToken);
+        if (refreshToken) localStorage.setItem("refresh_token", refreshToken);
+        localStorage.setItem("user", JSON.stringify(currentUser));
+
+        // Нужно завершить регистрацию
+        if (!currentUser.is_registration_complete) return;
+
+        // Редирект по роли
+        switch (currentUser.role) {
+            case "client":
+                navigate("/client");
+                break;
+            case "operator":
+                navigate("/operator");
+                break;
+            case "master":
+                navigate("/master");
+                break;
+            default:
+                navigate("/"); // fallback
+        }
+    };
 
     // Загрузка
     if (loading) {
@@ -76,7 +103,7 @@ const Login = () => {
         return <FullRegistrationForm />;
     }
 
-    // Всё ок — ничего не рендерим (редирект уже произошёл)
+    // Всё ок — редирект уже произошёл
     return null;
 };
 

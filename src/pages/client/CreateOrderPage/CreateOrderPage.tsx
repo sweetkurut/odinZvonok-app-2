@@ -1,10 +1,10 @@
-import { useState } from "react";
 import { Navigation, Card, Button } from "../../../shared/ui";
 import { Link, useNavigate } from "react-router-dom";
 import { Camera, MapPin, X } from "lucide-react";
 import styles from "./CreateOrderPage.module.scss";
 import Logo from "../../../assets/Logo.png";
 import { useAppDispatch, useAppSelector } from "@/shared/hooks";
+import { useState } from "react";
 import { createOrder } from "@/store/slices/orderSlice";
 
 export const CreateOrderPage = () => {
@@ -19,13 +19,17 @@ export const CreateOrderPage = () => {
     const [images, setImages] = useState<File[]>([]);
     const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
-    // Обработка загрузки фото
+    // Обработка загрузки фото (только для превью)
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             const files = Array.from(e.target.files);
+            if (images.length + files.length > 5) {
+                alert("Максимум 5 фото");
+                return;
+            }
+
             setImages((prev) => [...prev, ...files]);
 
-            // Создаём превью
             files.forEach((file) => {
                 const reader = new FileReader();
                 reader.onloadend = () => {
@@ -44,32 +48,29 @@ export const CreateOrderPage = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Подготовка FormData (если бэк принимает multipart/form-data)
-        const formData = new FormData();
-        formData.append("category", category);
-        formData.append("title", title);
-        formData.append("description", description);
-        formData.append("address", address);
-        images.forEach((image) => {
-            formData.append("images", image);
-        });
+        if (!category || !title || !description || !address) {
+            alert("Заполните все обязательные поля");
+            return;
+        }
 
-        // Или если бэк принимает JSON с base64 или URL — используй этот вариант:
+        // Бэкенд ожидает imageUrls как массив строк (ссылок)
+        // Пока у нас только локальные превью (base64) — отправляем их как есть
+        // В будущем бэкенд должен принимать файлы или ты должен загружать фото отдельно и получать URL
         const payload = {
             category,
             title,
             description,
             address,
-            imageUrls: previewUrls, // временно — пока бэк не примет файлы
+            imageUrls: previewUrls, // ← отправляем base64 строки (временно, пока бэк не примет файлы)
         };
 
         const result = await dispatch(createOrder(payload));
 
         if (createOrder.fulfilled.match(result)) {
-            // Успешно — переходим в список заказов клиента
-            navigate("/client");
+            alert("Заказ успешно создан!");
+            navigate("/client"); // или на страницу истории заказов
         }
-        // Если ошибка — она уже в createError, покажем ниже формы
+        // Ошибка уже в createError — покажем ниже
     };
 
     return (
@@ -177,37 +178,24 @@ export const CreateOrderPage = () => {
                                         </div>
                                     ))}
                                 </div>
-                                {images.length >= 5 && (
-                                    <p className={styles.limitText}>Максимум 5 фото</p>
-                                )}
+
+                                {images.length >= 5 && <p className={styles.limitText}>Максимум 5 фото</p>}
                             </div>
                         </div>
 
-                        {/* Ошибка создания */}
-                        {createError && (
-                            <div className={styles.errorMessage}>
-                                {createError}
-                            </div>
-                        )}
+                        {/* Ошибка */}
+                        {createError && <div className={styles.errorMessage}>{createError}</div>}
                     </Card>
 
                     {/* Кнопка отправки */}
                     <div className={styles.submitSection}>
                         <Button
-                            type="submit"
+                            // type="submit"
                             variant="primary"
                             size="large"
-                            className={styles.submitButton}
                             disabled={creating || !title || !description || !category || !address}
                         >
-                            {creating ? (
-                                <>
-                                    {/* <Spinner size="small" /> */}
-                                    Создание...
-                                </>
-                            ) : (
-                                "Создать заказ"
-                            )}
+                            {creating ? "Создание..." : "Создать заказ"}
                         </Button>
                     </div>
                 </form>

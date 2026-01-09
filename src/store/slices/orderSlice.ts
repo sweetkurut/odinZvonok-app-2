@@ -45,7 +45,7 @@ export const createOrder = createAsyncThunk<Order, CreateOrder, { rejectValue: s
             if (res.status !== 200 && res.status !== 201) {
                 return rejectWithValue(`Ошибка сервера: ${res.status}`);
             }
-            return res.data as Order;
+            return res.data;
         } catch (error: any) {
             console.error("createOrder error:", error);
             return rejectWithValue(error?.response?.data?.message || "Ошибка создания заказа");

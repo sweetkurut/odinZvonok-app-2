@@ -1,10 +1,10 @@
 import axios from "axios";
 import { getAccessToken } from "@/utils/auth";
 
-export const urlApi = "https://1-zvonok.com/api";
+export const urlApi = "https://1-zvonok.com/";
 
 const instance = axios.create({
-    // baseURL: urlApi + "api/",
+    baseURL: urlApi + "api/",
     headers: {
         "Content-Type": "application/json",
     },

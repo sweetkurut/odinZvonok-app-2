@@ -11,4 +11,15 @@ export default defineConfig({
             "@": path.resolve(__dirname, "./src"),
         },
     },
+    server: {
+        proxy: {
+            // Все запросы, начинающиеся с /api, перенаправляем на бэкенд
+            "/api": {
+                target: "https://1-zvonok.com", // твой бэкенд
+                changeOrigin: true,
+                secure: true, // для HTTPS
+                rewrite: (path) => path.replace(/^\/api/, "/api"), // опционально, если нужно
+            },
+        },
+    },
 });
