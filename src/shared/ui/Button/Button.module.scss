@@ -5,6 +5,9 @@
     cursor: pointer;
     transition: background-color 0.2s, transform 0.1s;
     font-family: Montserrat;
+    // padding: 10px;
+    display: flex;
+    align-items: center;
 
     &:disabled {
         opacity: 0.6;
@@ -30,7 +33,7 @@
     color: var(--tg-theme-text-color);
 
     &:hover:not(:disabled) {
-        background: #e0e0e0;
+        background: var(--tg-theme-secondary-bg-color);
     }
 }
 

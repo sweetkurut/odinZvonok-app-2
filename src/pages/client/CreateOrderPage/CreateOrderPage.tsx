@@ -83,7 +83,7 @@ export const CreateOrderPage = () => {
             </header>
 
             <main className={styles.main}>
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} className={styles.orderForm}>
                     <Card className={styles.formCard}>
                         {/* Категория */}
                         <div className={styles.formGroup}>

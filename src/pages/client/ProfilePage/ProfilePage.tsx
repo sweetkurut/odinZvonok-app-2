@@ -96,14 +96,9 @@ export const ProfilePage = () => {
                 <Card className={styles.userCard}>
                     <div className={styles.userAvatar}>
                         {user.profile_photo_url && user.profile_photo_url !== "string" ? (
-                            <img
-                                src={user.profile_photo_url}
-                                alt="Аватар"
-                                className={styles.avatarImage}
-                                onError={(e) => (e.currentTarget.style.display = "none")}
-                            />
+                            <img src={user.profile_photo_url} alt="Аватар" />
                         ) : (
-                            <User size={40} />
+                            <User size={32} />
                         )}
                     </div>
 
@@ -112,9 +107,8 @@ export const ProfilePage = () => {
                         <p className={styles.userRole}>{userRoleText}</p>
                     </div>
 
-                    <Button variant="secondary" size="small">
+                    <Button variant="secondary" size="small" className={styles.editBtn}>
                         <Edit size={16} />
-                        Редактировать
                     </Button>
                 </Card>
 
@@ -165,32 +159,6 @@ export const ProfilePage = () => {
                     )}
                 </section>
 
-                {/* Настройки */}
-                <section className={styles.preferencesSection}>
-                    <h3>Настройки</h3>
-
-                    <Card className={styles.preferenceCard}>
-                        <div className={styles.preferenceInfo}>
-                            <span>Уведомления</span>
-                            <p>Получать уведомления о статусе заказов</p>
-                        </div>
-                        <div className={styles.toggle}>
-                            <input type="checkbox" defaultChecked />
-                        </div>
-                    </Card>
-
-                    <Card className={styles.preferenceCard}>
-                        <div className={styles.preferenceInfo}>
-                            <span>SMS уведомления</span>
-                            <p>Получать SMS о важных обновлениях</p>
-                        </div>
-                        <div className={styles.toggle}>
-                            <input type="checkbox" />
-                        </div>
-                    </Card>
-                </section>
-
-                {/* Выход */}
                 <div className={styles.actions}>
                     <Button variant="danger" size="large" onClick={handleLogout}>
                         <LogOut size={20} style={{ marginRight: 8 }} />

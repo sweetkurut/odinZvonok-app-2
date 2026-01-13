@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { storesApi } from "@/api";
 import { useAppDispatch } from "@/store/hooks";
@@ -10,10 +10,10 @@ const FullRegistrationForm = () => {
     const [loading, setLoading] = useState(false);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
+    const submitRef = useRef(false);
 
     // Берём данные из Telegram, если доступны (для автозаполнения)
-    const tg = (window as any).Telegram?.WebApp;
-    const tgUser = tg?.initDataUnsafe?.user;
+    const tgUser = (window as any).Telegram?.WebApp?.initDataUnsafe?.user;
 
     const [form, setForm] = useState({
         first_name: tgUser?.first_name || "",
@@ -26,10 +26,12 @@ const FullRegistrationForm = () => {
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
+        setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     };
 
     const submit = async () => {
+        if (submitRef.current) return;
+        // Проверка обязательных полей
         if (!form.first_name || !form.last_name || !form.phone_number) {
             alert("Заполните обязательные поля: Имя, Фамилия, Телефон");
             return;
@@ -38,6 +40,7 @@ const FullRegistrationForm = () => {
         try {
             setLoading(true);
 
+            // Отправляем данные на сервер
             await storesApi.completeRegistration({
                 first_name: form.first_name,
                 last_name: form.last_name,
@@ -48,19 +51,13 @@ const FullRegistrationForm = () => {
                 profile_photo_url: form.profile_photo_url || undefined,
             });
 
-            // Обновляем данные пользователя
-            const updatedUser = await dispatch(fetchMe()).unwrap();
+            // Обновляем данные пользователя на фронте
+            await dispatch(fetchMe()).unwrap();
 
             alert("Регистрация завершена!");
 
-            // Редиректим по роли
-            if (updatedUser.role === "client") {
-                navigate("/client");
-            } else if (updatedUser.role === "operator") {
-                navigate("/operator");
-            } else if (updatedUser.role === "master") {
-                navigate("/master");
-            }
+            // Редирект сразу на страницу client
+            navigate("/client");
         } catch (err: any) {
             const msg = err?.response?.data?.message || "Ошибка при сохранении данных";
             alert(msg);
@@ -68,6 +65,9 @@ const FullRegistrationForm = () => {
             setLoading(false);
         }
     };
+
+    // Проверка кнопки на валидность (обязательные поля)
+    const isSubmitDisabled = !form.first_name || !form.last_name || !form.phone_number || loading;
 
     return (
         <div className={styles.wrapper}>
@@ -123,7 +123,7 @@ const FullRegistrationForm = () => {
                     onChange={handleChange}
                 />
 
-                <button onClick={submit} disabled={loading}>
+                <button onClick={submit} disabled={isSubmitDisabled}>
                     {loading ? "Сохранение..." : "Продолжить"}
                 </button>
             </div>

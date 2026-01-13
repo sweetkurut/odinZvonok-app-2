@@ -1,3 +1,16 @@
+.createOrderPage {
+    min-height: 100vh;
+    padding-bottom: 80px;
+    // background: #f6f7f9;
+    background: #f6f7f9;
+}
+.orderForm {
+    // min-height: 100vh;
+    // padding-bottom: 80px;
+    // // background: #f6f7f9;
+    background: #f6f7f9;
+}
+
 .previewGrid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
@@ -47,8 +60,6 @@
     font-size: 0.9rem;
 }
 
-
-
 .createOrderPage {
     min-height: 100vh;
     padding-bottom: 80px;
@@ -93,7 +104,7 @@
         font-size: 14px;
         font-weight: 500;
         margin-bottom: 8px;
-        color: var(--tg-theme-text-color);
+        // color: var(--tg-theme-text-color);
     }
 
     input,
@@ -200,7 +211,8 @@
     position: sticky;
     bottom: 80px;
     background: white;
-    padding: 16px 0;
+    padding: 16px;
+    border-radius: 10px;
 
     .button {
         width: 100%;

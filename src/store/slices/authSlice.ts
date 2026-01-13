@@ -62,6 +62,9 @@ export const fetchTelegramAuth = createAsyncThunk<ITelegramAuthResponse, string,
     async (initData, { rejectWithValue }) => {
         try {
             const res = await storesApi.telegramAuth({ init_data: initData });
+            console.log("====================================");
+            console.log(res);
+            console.log("====================================");
             saveTokens(res.data.access_token, res.data.refresh_token);
             return res.data;
         } catch (e: any) {

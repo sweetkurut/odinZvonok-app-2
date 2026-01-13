@@ -2,8 +2,9 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { fetchTelegramAuth } from "@/store/slices/authSlice";
+import { fetchTelegramAuth, fetchMe } from "@/store/slices/authSlice";
 import FullRegistrationForm from "@/widgets/FullRegistrationForm/FullRegistrationForm";
+import { saveTokens } from "@/utils/auth"; // твой файл с токенами
 import styles from "./style.module.scss";
 
 const Login = () => {
@@ -12,7 +13,9 @@ const Login = () => {
     const { user, loading, error, isAuthenticated } = useAppSelector((state) => state.auth);
 
     useEffect(() => {
+        if (loading) return;
         const tg = (window as any).Telegram?.WebApp;
+        if (!tg?.initData) return;
 
         // DEV MODE — мок initData
         if (import.meta.env.DEV && !tg) {
@@ -24,11 +27,16 @@ const Login = () => {
             const initDev = async () => {
                 try {
                     const result = await dispatch(fetchTelegramAuth(mockInitData)).unwrap();
-                    saveAndRedirect(result.user);
+                    if (result.access_token && result.refresh_token) {
+                        await saveTokens(result.access_token, result.refresh_token);
+                    }
+                    await dispatch(fetchMe()).unwrap(); // обновляем профиль пользователя
+                    navigate("/client"); // редирект после авторизации
                 } catch (err) {
                     console.error("Ошибка DEV auth:", err);
                 }
             };
+
             initDev();
             return;
         }
@@ -45,7 +53,19 @@ const Login = () => {
         const init = async () => {
             try {
                 const result = await dispatch(fetchTelegramAuth(tg.initData)).unwrap();
-                saveAndRedirect(result.user, result.access_token, result.refresh_token);
+
+                // Сохраняем токены через utils
+                if (result.access_token && result.refresh_token) {
+                    await saveTokens(result.access_token, result.refresh_token);
+                }
+
+                // Обновляем данные пользователя
+                await dispatch(fetchMe()).unwrap();
+
+                // Редирект после завершения регистрации
+                if (result.user?.is_registration_complete) {
+                    navigate("/client");
+                }
             } catch (err) {
                 console.error("Ошибка Telegram auth:", err);
             }
@@ -53,34 +73,6 @@ const Login = () => {
 
         init();
     }, [dispatch, navigate]);
-
-    // Сохраняем токены и редиректим
-    const saveAndRedirect = (currentUser: any, accessToken?: string, refreshToken?: string) => {
-        if (!currentUser) return;
-
-        // Сохраняем токены
-        if (accessToken) localStorage.setItem("access_token", accessToken);
-        if (refreshToken) localStorage.setItem("refresh_token", refreshToken);
-        localStorage.setItem("user", JSON.stringify(currentUser));
-
-        // Нужно завершить регистрацию
-        if (!currentUser.is_registration_complete) return;
-
-        // Редирект по роли
-        switch (currentUser.role) {
-            case "client":
-                navigate("/client");
-                break;
-            case "operator":
-                navigate("/operator");
-                break;
-            case "master":
-                navigate("/master");
-                break;
-            default:
-                navigate("/"); // fallback
-        }
-    };
 
     // Загрузка
     if (loading) {
@@ -103,7 +95,7 @@ const Login = () => {
         return <FullRegistrationForm />;
     }
 
-    // Всё ок — редирект уже произошёл
+    // Всё ок — редирект уже произошёл или пользователь не авторизован
     return null;
 };
 

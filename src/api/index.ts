@@ -44,22 +44,18 @@ export const storesApi = {
     },
 
     // получение списка всех заказов (клиент)
-    getAllOrders(
-        params: {
-            page?: number;
-            size?: number;
-            sort?: string;
-        } = {}
-    ) {
+    getAllOrders(params = {}) {
         const { page = 0, size = 10, sort = "created_at,desc" } = params;
-
-        return instance.get<Orders>("/orders/my", {
-            params: {
-                page,
-                size,
-                sort,
-            },
-        });
+        return instance
+            .get<Orders>("/orders/my", { params })
+            .then((res) => {
+                console.log("Orders response:", res.data);
+                return res;
+            })
+            .catch((err) => {
+                console.error("Orders error:", err);
+                throw err;
+            });
     },
 
     createOrder(orderData: CreateOrder) {

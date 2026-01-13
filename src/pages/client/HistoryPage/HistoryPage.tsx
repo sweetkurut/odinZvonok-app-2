@@ -7,6 +7,7 @@ import type { RootState } from "@/store";
 import { useAppDispatch, useAppSelector } from "@/shared/hooks";
 import { useEffect } from "react";
 import { fetchOrders } from "@/store/slices/orderSlice";
+import Loader from "@/shared/ui/Loader/Loader";
 
 export const HistoryPage = () => {
     const orders = useAppSelector((state: RootState) => state.orders.orders);
@@ -51,7 +52,11 @@ export const HistoryPage = () => {
     };
 
     if (loading) {
-        return <div className={styles.loader}>Загрузка истории...</div>;
+        return (
+            <div className={styles.loader}>
+                <Loader />
+            </div>
+        );
     }
 
     if (error) {
