@@ -6,6 +6,7 @@ import { fetchTelegramAuth, fetchMe } from "@/store/slices/authSlice";
 import FullRegistrationForm from "@/widgets/FullRegistrationForm/FullRegistrationForm";
 import { saveTokens } from "@/utils/auth"; // твой файл с токенами
 import styles from "./style.module.scss";
+import Loader from "@/shared/ui/Loader/Loader";
 
 const Login = () => {
     const dispatch = useAppDispatch();
@@ -76,7 +77,11 @@ const Login = () => {
 
     // Загрузка
     if (loading) {
-        return <div className={styles.loader}>Загрузка...</div>;
+        return (
+            <div className={styles.loader}>
+                <Loader />
+            </div>
+        );
     }
 
     // Ошибка

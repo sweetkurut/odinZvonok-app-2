@@ -1,6 +1,6 @@
 .profilePage {
     min-height: 100vh;
-    padding-bottom: 90px;
+    // padding-bottom: 90px;
     background: #f6f7f9;
 }
 
@@ -48,6 +48,7 @@
     align-items: center;
     gap: 16px;
     padding: 16px;
+    flex-direction: column;
     border-radius: 16px;
     background: #fff;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
@@ -170,17 +171,49 @@
 }
 
 .actions {
-    // margin-top: 32px;
-    margin-top: auto;
-    position: fixed;
-    bottom: 90px;
-    left: 0;
-    width: 100%;
-    padding: 0 20px;
+    margin-bottom: 70px;
 
     button {
         width: 100%;
         border-radius: 14px;
         font-weight: 500;
     }
+}
+
+.editForm {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    label {
+        font-size: 13px;
+        color: #6b7280;
+    }
+
+    input {
+        font-family: "Montserrat", sans-serif;
+        padding: 12px;
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+        font-size: 14px;
+        outline: none;
+        transition: border 0.2s;
+
+        &:focus {
+            border-color: var(--tg-theme-button-color);
+        }
+    }
+}
+
+.logoutText {
+    font-size: 15px;
+    color: #374151;
+    text-align: center;
+    padding: 12px 0;
 }

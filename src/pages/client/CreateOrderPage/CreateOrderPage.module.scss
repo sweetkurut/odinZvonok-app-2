@@ -208,13 +208,14 @@
 }
 
 .submitSection {
-    position: sticky;
-    bottom: 80px;
     background: white;
     padding: 16px;
     border-radius: 10px;
+    width: 100%;
 
-    .button {
+    button {
         width: 100%;
+        border-radius: 10px;
+        font-weight: 500;
     }
 }

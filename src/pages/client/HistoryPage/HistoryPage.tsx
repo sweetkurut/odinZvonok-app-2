@@ -17,8 +17,10 @@ export const HistoryPage = () => {
     const dispatch = useAppDispatch();
 
     useEffect(() => {
-        dispatch(fetchOrders());
-    }, [dispatch]);
+        if (!orders || orders.length === 0) {
+            dispatch(fetchOrders());
+        }
+    }, [dispatch, orders?.length]);
 
     const getStatusIcon = (status: string) => {
         switch (status) {
@@ -86,31 +88,29 @@ export const HistoryPage = () => {
                     <div className={styles.ordersList}>
                         {orders.map((order) => (
                             <Card key={order.id} className={styles.orderCard}>
-                                <div className={styles.orderHeader}>
-                                    <h3>{order.title || "Без заголовка"}</h3>
-                                    <div className={styles.orderStatus}>
-                                        {getStatusIcon(order.status)}
-                                        <span>{getStatusText(order.status)}</span>
-                                    </div>
+                                <div className={styles.topRow}>
+                                    <h3 className={styles.title}>{order.title || "Без заголовка"}</h3>
+
+                                    <span
+                                        className={`${styles.status} ${styles[order.status?.toLowerCase()]}`}
+                                    >
+                                        {getStatusText(order.status)}
+                                    </span>
                                 </div>
 
-                                <p className={styles.orderDescription}>
-                                    {order.description || "Нет описания"}
+                                <p className={styles.description}>
+                                    {order.description || "Описание отсутствует"}
                                 </p>
 
-                                {order.address && (
-                                    <p className={styles.orderAddress}>Адрес: {order.address}</p>
-                                )}
+                                {order.address && <div className={styles.address}>📍 {order.address}</div>}
 
-                                <div className={styles.orderFooter}>
-                                    <span className={styles.orderDate}>
+                                <div className={styles.bottomRow}>
+                                    <span className={styles.date}>
                                         {new Date(order.created_at).toLocaleDateString("ru-RU")}
                                     </span>
 
                                     {order.master && (
-                                        <span className={styles.orderMaster}>
-                                            Мастер: {order.master.fullName}
-                                        </span>
+                                        <span className={styles.master}>👨‍🔧 {order.master.fullName}</span>
                                     )}
                                 </div>
                             </Card>

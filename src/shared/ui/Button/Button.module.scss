@@ -1,4 +1,5 @@
 .button {
+    padding: 10px 20px;
     border: none;
     border-radius: 8px;
     font-weight: 500;
@@ -8,6 +9,8 @@
     // padding: 10px;
     display: flex;
     align-items: center;
+    text-align: center;
+    justify-content: center;
 
     &:disabled {
         opacity: 0.6;
@@ -61,11 +64,13 @@
 }
 
 .medium {
-    padding: 12px 24px;
+    padding: 10px 20px;
     font-size: 16px;
+    text-align: center;
 }
 
 .large {
-    padding: 16px 32px;
+    padding: 16px 30px;
     font-size: 18px;
+    text-align: center;
 }

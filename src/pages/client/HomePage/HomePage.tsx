@@ -42,7 +42,7 @@ export const HomePage = () => {
                         onClick={() => navigate("/client/create-order")}
                         className={styles.createOrderBtn}
                     >
-                        Создать заказ
+                        Заказать
                     </Button>
                     <Button variant="secondary" onClick={() => navigate("/client/help")}>
                         Получить помощь

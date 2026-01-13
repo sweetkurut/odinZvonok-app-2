@@ -4,14 +4,17 @@ import styles from "./ProfilePage.module.scss";
 import Logo from "../../../assets/Logo.png";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/shared/hooks";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { fetchMe, fetchLogout } from "@/store/slices/authSlice";
+import { Modal } from "@/shared/ui/Modal";
 
 export const ProfilePage = () => {
+    const { user, loading, error } = useAppSelector((state) => state.auth);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
+    const [isEditOpen, setIsEditOpen] = useState(false);
+    const [isLogoutOpen, setIsLogoutOpen] = useState(false);
 
-    const { user, loading, error } = useAppSelector((state) => state.auth);
     // console.log(user, "ssdsdsd");
 
     // Загружаем профиль, если его нет
@@ -107,8 +110,13 @@ export const ProfilePage = () => {
                         <p className={styles.userRole}>{userRoleText}</p>
                     </div>
 
-                    <Button variant="secondary" size="small" className={styles.editBtn}>
-                        <Edit size={16} />
+                    <Button
+                        variant="secondary"
+                        size="small"
+                        className={styles.editBtn}
+                        onClick={() => setIsEditOpen(true)}
+                    >
+                        Редактировать <Edit size={16} />
                     </Button>
                 </Card>
 
@@ -160,12 +168,73 @@ export const ProfilePage = () => {
                 </section>
 
                 <div className={styles.actions}>
-                    <Button variant="danger" size="large" onClick={handleLogout}>
+                    <Button variant="danger" size="large" onClick={() => setIsLogoutOpen(true)}>
                         <LogOut size={20} style={{ marginRight: 8 }} />
                         Выйти из аккаунта
                     </Button>
                 </div>
             </main>
+
+            <Modal
+                isOpen={isEditOpen}
+                onClose={() => setIsEditOpen(false)}
+                title="Редактирование профиля"
+                footer={
+                    <>
+                        <Button variant="secondary" onClick={() => setIsEditOpen(false)}>
+                            Отмена
+                        </Button>
+                        <Button>Сохранить</Button>
+                    </>
+                }
+            >
+                <div className={styles.editForm}>
+                    <div className={styles.formGroup}>
+                        <label>Имя</label>
+                        <input defaultValue={user.first_name || ""} />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                        <label>Фамилия</label>
+                        <input defaultValue={user.last_name || ""} />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                        <label>Телефон</label>
+                        <input defaultValue={user.phone_number || ""} />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                        <label>Email</label>
+                        <input defaultValue={user.email || ""} />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                        <label>Адрес</label>
+                        <input defaultValue={user.address || ""} />
+                    </div>
+                </div>
+            </Modal>
+
+            <div className={styles.logoutModal}>
+                <Modal
+                    isOpen={isLogoutOpen}
+                    onClose={() => setIsLogoutOpen(false)}
+                    title="Выход из аккаунта"
+                    footer={
+                        <>
+                            <Button variant="secondary" onClick={() => setIsLogoutOpen(false)}>
+                                Отмена
+                            </Button>
+                            <Button variant="danger" onClick={handleLogout}>
+                                Выйти
+                            </Button>
+                        </>
+                    }
+                >
+                    <p className={styles.logoutText}>Вы действительно хотите выйти из аккаунта?</p>
+                </Modal>
+            </div>
 
             <Navigation role={navigationRole} />
         </div>

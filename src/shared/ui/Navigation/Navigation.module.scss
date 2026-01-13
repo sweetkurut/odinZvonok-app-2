@@ -23,15 +23,22 @@
     cursor: pointer;
     padding: 8px 12px;
     color: #999;
-    transition: color 0.2s;
+    transition: 0.4s all;
     font-family: Montserrat;
 
     &:hover {
         color: var(--tg-theme-link-color);
+        background: #00000073 !important;
+        color: #fff;
+        border-radius: 15px;
     }
 
     &.active {
-        color: var(--tg-theme-link-color);
+        // color: var(--tg-theme-link-color);
+        color: #fff;
+        border-radius: 15px;
+        // padding: 3px;
+        background: #000000 !important;
     }
 }
 
