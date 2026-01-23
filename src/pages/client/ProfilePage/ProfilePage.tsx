@@ -187,13 +187,13 @@ export const ProfilePage = () => {
                     <h3>Контактная информация</h3>
 
                     {user.phone_number && (
-                        <Card>
+                        <Card className={styles.contactCard}>
                             <Phone /> {user.phone_number}
                         </Card>
                     )}
 
                     {user.email && (
-                        <Card>
+                        <Card className={styles.contactCard}>
                             <Mail /> {user.email}
                         </Card>
                     )}
@@ -206,7 +206,11 @@ export const ProfilePage = () => {
                     )}
                 </section>
 
-                <Button variant="danger" onClick={() => setIsLogoutOpen(true)}>
+                <Button
+                    variant="secondary"
+                    onClick={() => setIsLogoutOpen(true)}
+                    className={styles.logoutButton}
+                >
                     <LogOut /> Выйти
                 </Button>
             </main>
