@@ -17,7 +17,7 @@ export const OrderPage = () => {
             </header>
 
             <main className={styles.main}>
-                <Card className={styles.orderCard}> 
+                <Card className={styles.orderCard}>
                     <div className={styles.categoryTag}>
                         <span>Категория: Бытовая техника</span>
                     </div>
@@ -67,14 +67,14 @@ export const OrderPage = () => {
                             </div>
 
                             <div className={styles.masterActions}>
-                                <button className={styles.contactButton}>
+                                <div className={styles.contactButton}>
                                     <Phone size={16} />
-                                </button>
-                                <button className={styles.contactButton}>
+                                </div>
+                                <div className={styles.contactButton}>
                                     <MessageCircle size={16} />
-                                </button>
+                                </div>
                                 <Button
-                                    variant="primary"
+                                    variant="secondary"
                                     size="small"
                                     onClick={() => navigate(`/operator/master/${master}`)}
                                 >

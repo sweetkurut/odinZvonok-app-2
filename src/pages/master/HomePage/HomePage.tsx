@@ -16,7 +16,7 @@ export const HomePage = () => {
         <div className={styles.homePage}>
             <header className={styles.header}>
                 <div className={styles.userInfo}>
-                    <Link to={"/client"}>
+                    <Link to={"/master"}>
                         <img src={Logo} alt="" />
                     </Link>
                 </div>
@@ -73,15 +73,15 @@ export const HomePage = () => {
                     <h3>Текущий вызов</h3>
                     <div className={styles.orderFilters}>
                         <select className={styles.filterSelect}>
-                            <option>Для всех профессий</option>
-                            <option>Электрика</option>
-                            <option>Сантехника</option>
-                            <option>Бытовая техника</option>
+                            <option className={styles.option}>Для всех профессий</option>
+                            <option className={styles.option}>Электрика</option>
+                            <option className={styles.option}>Сантехника</option>
+                            <option className={styles.option}>Бытовая техника</option>
                         </select>
                         <select className={styles.filterSelect}>
-                            <option>Адрес: Все области</option>
-                            <option>Бишкек</option>
-                            <option>Ош</option>
+                            <option className={styles.option}>Адрес: Все области</option>
+                            <option className={styles.option}>Бишкек</option>
+                            <option className={styles.option}>Ош</option>
                         </select>
                     </div>
 
@@ -95,9 +95,9 @@ export const HomePage = () => {
                             <div className={styles.callDescription}>
                                 <h4>Фильтр</h4>
                                 <div className={styles.callButtons}>
-                                    <button className={styles.actionButton}>❌ Не интересно</button>
-                                    <button className={styles.actionButton}>⭐ Мне нравится</button>
-                                    <button className={styles.actionButton}>✅ Принять</button>
+                                    <div className={styles.actionButton}>❌ Не интересно</div>
+                                    <div className={styles.actionButton}>⭐ Мне нравится</div>
+                                    <div className={styles.actionButton}>✅ Принять</div>
                                 </div>
                             </div>
                         </div>

@@ -38,7 +38,7 @@ export const HomePage = () => {
         <div className={styles.homePage}>
             <header className={styles.header}>
                 <div className={styles.userInfo}>
-                    <Link to={"/client"}>
+                    <Link to={"/operator"}>
                         <img src={Logo} alt="" />
                     </Link>
                 </div>
@@ -90,7 +90,7 @@ export const HomePage = () => {
                             </div>
 
                             <div className={styles.orderActions}>
-                                <Button variant="primary" size="small">
+                                <Button variant="secondary" size="small">
                                     Подробнее
                                 </Button>
                             </div>

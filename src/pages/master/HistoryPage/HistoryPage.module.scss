@@ -5,13 +5,16 @@
 }
 
 .header {
-    background: var(--tg-theme-button-color);
-    color: white;
+    color: #333;
     padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #0000001f;
     text-align: center;
 
     h1 {
-        font-size: 18px;
+        font-size: 20px;
         font-weight: 600;
     }
 }

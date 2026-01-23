@@ -45,6 +45,7 @@ export const AppRouter = () => {
             {/* Master Routes */}
             <Route path="/master" element={<MasterHomePage />} />
             <Route path="/master/history" element={<MasterHistoryPage />} />
+            {/* <Route path="/master/order" element={<MasterOrderPage />} /> */}
             <Route path="/master/order/:id" element={<MasterOrderPage />} />
         </Routes>
     );
