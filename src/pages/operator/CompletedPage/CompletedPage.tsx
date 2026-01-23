@@ -13,7 +13,7 @@ export const CompletedPage = () => {
                 <button className={styles.backButton} onClick={() => navigate("/operator")}>
                     <ArrowLeft size={20} />
                 </button>
-                <h1>Завершено</h1>
+                <h1>Завершенные сделки</h1>
                 <div className={styles.statusIcon}>
                     <CheckCircle size={24} />
                 </div>

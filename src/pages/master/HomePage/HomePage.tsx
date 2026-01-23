@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Navigation, Card, Button } from "../../../shared/ui";
 import { User } from "lucide-react";
 import styles from "./HomePage.module.scss";
+import { Link } from "react-router-dom";
+import Logo from "../../../assets/Logo.png";
 
 export const HomePage = () => {
     const [isAvailable, setIsAvailable] = useState(false);
@@ -14,8 +16,13 @@ export const HomePage = () => {
         <div className={styles.homePage}>
             <header className={styles.header}>
                 <div className={styles.userInfo}>
-                    <div className={styles.avatar}>М</div>
-                    <span className={styles.userName}>Мастер</span>
+                    <Link to={"/client"}>
+                        <img src={Logo} alt="" />
+                    </Link>
+                </div>
+                <div>
+                    {/* <h1 className={styles.userName}>{user?.name}</h1> */}
+                    <h1 className={styles.userName}>Мастер</h1>
                 </div>
             </header>
 

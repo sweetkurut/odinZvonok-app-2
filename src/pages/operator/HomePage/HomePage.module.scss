@@ -1,111 +1,118 @@
 .homePage {
-  min-height: 100vh;
-  padding-bottom: 80px;
+    min-height: 100vh;
+    padding-bottom: 80px;
+    // background: #f6f7f9;
 }
 
 .header {
-  background: var(--tg-theme-button-color);
-  color: white;
-  padding: 16px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
+    color: #333;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #0000001f;
+    text-align: center;
 
+    h1 {
+        font-size: 20px;
+        font-weight: 600;
+    }
+}
 .userInfo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 .avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 18px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 18px;
 }
 
 .userName {
-  font-weight: 500;
+    font-weight: 500;
 }
 
 .main {
-  padding: 20px;
+    padding: 20px;
 }
 
 .filters {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 20px;
-  overflow-x: auto;
-  padding-bottom: 4px;
-  
-  .button {
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+
+    .button {
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
 }
 
 .currentOrders {
-  h2 {
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 16px;
-  }
+    h2 {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 16px;
+    }
 }
 
 .orderCard {
-  cursor: pointer;
-  
-  &:hover {
-    transform: translateY(-2px);
-  }
+    cursor: pointer;
+
+    &:hover {
+        transform: translateY(-2px);
+    }
 }
 
 .orderHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-  
-  h3 {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--tg-theme-text-color);
-  }
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+
+    h3 {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--tg-theme-text-color);
+    }
 }
 
 .orderTime {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  color: var(--tg-theme-hint-color);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--tg-theme-hint-color);
 }
 
 .orderInfo {
-  margin-bottom: 16px;
+    margin-bottom: 16px;
 }
 
-.clientInfo, .addressInfo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
-  font-size: 14px;
-  color: var(--tg-theme-hint-color);
-  
-  svg {
-    flex-shrink: 0;
-  }
+.clientInfo,
+.addressInfo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    font-size: 14px;
+    color: var(--tg-theme-hint-color);
+
+    svg {
+        flex-shrink: 0;
+    }
 }
 
 .orderActions {
-  display: flex;
-  justify-content: flex-end;
+    display: flex;
+    justify-content: flex-end;
 }
