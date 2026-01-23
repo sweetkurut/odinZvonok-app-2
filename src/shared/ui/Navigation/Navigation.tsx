@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { Home, Phone, History, User, FileText } from "lucide-react";
+import { Home, Phone, History, User, FileText, Layers, Package, BadgeDollarSign } from "lucide-react";
 import styles from "./Navigation.module.scss";
 
 interface NavigationProps {
@@ -15,7 +15,7 @@ export const Navigation = ({ role }: NavigationProps) => {
             case "client":
                 return [
                     { path: "/client", icon: Home, label: "Главная" },
-                    { path: "/client/help", icon: Phone, label: "Помощь" },
+                    { path: "/client/tariffs", icon: BadgeDollarSign, label: "Тариф" },
                     { path: "/client/history", icon: History, label: "История" },
                     { path: "/client/create-order", icon: FileText, label: "Заказ" },
                     { path: "/client/profile", icon: User, label: "Профиль" },

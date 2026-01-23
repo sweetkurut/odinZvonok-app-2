@@ -1,111 +1,98 @@
-import { Navigation, Card, Button } from '../../../shared/ui';
-import { Check } from 'lucide-react';
-import styles from './TariffPage.module.scss';
+import { Navigation, Card } from "../../../shared/ui";
+import { Check } from "lucide-react";
+import styles from "./TariffPage.module.scss";
+import { Link } from "react-router-dom";
+import Logo from "../../../assets/Logo.png";
+import { useAppDispatch, useAppSelector } from "@/shared/hooks";
+import { useEffect } from "react";
+import { fetchTariffs } from "@/store/slices/tariffSlice";
+import { TariffCardSkeleton } from "@/shared/ui/TariffCardSkeleton/TariffCardSkeleton";
 
 export const TariffPage = () => {
-  const tariffs = [
-    {
-      id: 'standard',
-      name: 'ТАРИФ «СТАНДАРТ»',
-      price: '2000 сом',
-      period: 'ежемесячно',
-      features: [
-        'Диагностика',
-        'Электрика',
-        'Монтажные работы',
-        'Каркас Бытовой техники',
-        'Другие и закуки'
-      ],
-      color: '#333'
-    },
-    {
-      id: 'premium',
-      name: 'ТАРИФ «ПРЕМИУМ»',
-      price: '3000 сом',
-      period: 'ежемесячно',
-      features: [
-        'Диагностика',
-        'Электрика',
-        'Монтажные работы',
-        'Каркас Бытовой техники',
-        'Другие и закуки',
-        'Приоритетное обслуживание',
-        'Скидки до 50%',
-        'Без выезда и диагностики',
-        'VIP статус'
-      ],
-      color: '#0088cc',
-      recommended: true
-    }
-  ];
+    const dispatch = useAppDispatch();
+    const { tariffs, loading, isInitialLoading } = useAppSelector((state) => state.tariffs);
 
-  return (
-    <div className={styles.tariffPage}>
-      <header className={styles.header}>
-        <h1>Мой тариф</h1>
-      </header>
+    useEffect(() => {
+        if (isInitialLoading) {
+            dispatch(fetchTariffs());
+        }
+    }, [dispatch, isInitialLoading]);
 
-      <main className={styles.main}>
-        <div className={styles.tariffsList}>
-          {tariffs.map((tariff) => (
-            <Card 
-              key={tariff.id} 
-              className={`${styles.tariffCard} ${tariff.recommended ? styles.recommended : ''}`}
-            >
-              {tariff.recommended && (
-                <div className={styles.recommendedBadge}>
-                  Рекомендуемый
-                </div>
-              )}
-              
-              <div className={styles.tariffHeader}>
-                <h3 style={{ color: tariff.color }}>{tariff.name}</h3>
-                <div className={styles.tariffPrice}>
-                  <span className={styles.price}>{tariff.price}</span>
-                  <span className={styles.period}>{tariff.period}</span>
-                </div>
-              </div>
+    if (isInitialLoading && loading) {
+        return (
+            <div className={styles.tariffPage}>
+                <header className={styles.header}>
+                    <Link to="/client">
+                        <img src={Logo} alt="Логотип" />
+                    </Link>
+                    <h1>Тариф</h1>
+                </header>
 
-              <div className={styles.tariffFeatures}>
-                {tariff.features.map((feature, index) => (
-                  <div key={index} className={styles.feature}>
-                    <Check size={16} className={styles.checkIcon} />
-                    <span>{feature}</span>
-                  </div>
-                ))}
-              </div>
+                <main className={styles.main}>
+                    {Array.from({ length: 2 }).map((_, i) => (
+                        <TariffCardSkeleton key={i} />
+                    ))}
+                </main>
 
-              <div className={styles.tariffActions}>
-                <Button 
-                  variant={tariff.recommended ? "primary" : "secondary"}
-                  size="medium"
-                >
-                  {tariff.id === 'premium' ? 'Активировать' : 'Выбрать тариф'}
-                </Button>
-              </div>
-            </Card>
-          ))}
-        </div>
-
-        <div className={styles.currentTariff}>
-          <Card className={styles.currentCard}>
-            <h3>Текущий тариф</h3>
-            <p>ТАРИФ «СТАНДАРТ»</p>
-            <div className={styles.tariffDetails}>
-              <div className={styles.detail}>
-                <span>Активен до:</span>
-                <span>25.02.2024</span>
-              </div>
-              <div className={styles.detail}>
-                <span>Остается дней:</span>
-                <span>15</span>
-              </div>
+                <Navigation role="client" />
             </div>
-          </Card>
-        </div>
-      </main>
+        );
+    }
 
-      <Navigation role="client" />
-    </div>
-  );
+    return (
+        <div className={styles.tariffPage}>
+            <header className={styles.header}>
+                <Link to={"/client"}>
+                    <img src={Logo} alt="Логотип" />
+                </Link>
+                <h1>Тариф</h1>
+            </header>
+
+            <main className={styles.main}>
+                <div className={styles.tariffsList}>
+                    {tariffs?.map((tariff) => (
+                        <Card
+                            key={tariff.id}
+                            className={`${styles.tariffCard} ${tariff.active ? styles.active : ""}`}
+                        >
+                            <div className={styles.cardHeader}>
+                                <div className={styles.headerInfo}>
+                                    <span className={styles.overline}>ТАРИФ</span>
+                                    <h3 className={styles.tariffName}>{tariff.name}</h3>
+                                </div>
+                                <div className={styles.priceWrapper}>
+                                    <span className={styles.priceValue}>{tariff.price} Сом</span>
+                                    <span className={styles.pricePeriod}>/мес</span>
+                                </div>
+                            </div>
+
+                            <p className={styles.description}>{tariff.description}</p>
+
+                            <div className={styles.featuresList}>
+                                {tariff.features.map((feature, index) => (
+                                    <div key={index} className={styles.featureItem}>
+                                        <div className={styles.checkIconWrapper}>
+                                            <Check size={14} strokeWidth={3} />
+                                        </div>
+                                        <span>{feature}</span>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <button
+                                className={`${styles.actionButton} ${tariff.active ? styles.activeButton : ""}`}
+                            >
+                                {tariff.active ? "Активен" : "Не активен"}
+                            </button>
+                        </Card>
+                    ))}
+                    {/* {!loading && tariffs.length === 0 && (
+                        <p style={{ textAlign: "center", color: "#868e96" }}>Тарифы недоступны</p>
+                    )} */}
+                </div>
+            </main>
+
+            <Navigation role="client" />
+        </div>
+    );
 };

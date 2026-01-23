@@ -1,39 +1,28 @@
 import { Navigation, Card } from "../../../shared/ui";
-import { Clock, CheckCircle, XCircle } from "lucide-react";
 import styles from "./HistoryPage.module.scss";
 import Logo from "../../../assets/Logo.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import type { RootState } from "@/store";
 import { useAppDispatch, useAppSelector } from "@/shared/hooks";
 import { useEffect } from "react";
 import { fetchOrders } from "@/store/slices/orderSlice";
-import Loader from "@/shared/ui/Loader/Loader";
+import { OrderCardSkeleton } from "@/shared/ui/OrderCardSkeleton/OrderCardSkeleton";
 
 export const HistoryPage = () => {
-    const orders = useAppSelector((state: RootState) => state.orders.orders);
-    const loading = useAppSelector((state: RootState) => state.orders.loading);
-    const error = useAppSelector((state: RootState) => state.orders.error);
-
     const dispatch = useAppDispatch();
+    const { orders, loading, isInitialLoading, error } = useAppSelector((state: RootState) => state.orders);
+
+    const navigate = useNavigate();
+
+    const handleNavigate = () => {
+        navigate("/client/create-order");
+    };
 
     useEffect(() => {
-        if (!orders || orders.length === 0) {
+        if (isInitialLoading) {
             dispatch(fetchOrders());
         }
-    }, [dispatch, orders?.length]);
-
-    const getStatusIcon = (status: string) => {
-        switch (status) {
-            case "COMPLETED":
-            case "completed":
-                return <CheckCircle size={20} className={styles.statusCompleted} />;
-            case "CANCELLED":
-            case "cancelled":
-                return <XCircle size={20} className={styles.statusCancelled} />;
-            default:
-                return <Clock size={20} className={styles.statusPending} />;
-        }
-    };
+    }, [dispatch, isInitialLoading]);
 
     const getStatusText = (status: string) => {
         switch (status) {
@@ -53,10 +42,25 @@ export const HistoryPage = () => {
         }
     };
 
-    if (loading) {
+    if (isInitialLoading && loading) {
         return (
-            <div className={styles.loader}>
-                <Loader />
+            <div className={styles.historyPage}>
+                <header className={styles.header}>
+                    <Link to="/client">
+                        <img src={Logo} alt="Логотип" />
+                    </Link>
+                    <h1>История заказов</h1>
+                </header>
+
+                <main className={styles.main}>
+                    <div className={styles.ordersList}>
+                        {Array.from({ length: 4 }).map((_, i) => (
+                            <OrderCardSkeleton key={i} />
+                        ))}
+                    </div>
+                </main>
+
+                <Navigation role="client" />
             </div>
         );
     }
@@ -83,11 +87,16 @@ export const HistoryPage = () => {
                 {!orders || orders.length === 0 ? (
                     <div className={styles.emptyState}>
                         <p>У вас пока нет заказов</p>
+                        <button onClick={handleNavigate}>Добавить</button>
                     </div>
                 ) : (
                     <div className={styles.ordersList}>
                         {orders.map((order) => (
-                            <Card key={order.id} className={styles.orderCard}>
+                            <Card
+                                key={order.id}
+                                className={styles.orderCard}
+                                onClick={() => navigate(`/client/history/${order.id}`)}
+                            >
                                 <div className={styles.topRow}>
                                     <h3 className={styles.title}>{order.title || "Без заголовка"}</h3>
 

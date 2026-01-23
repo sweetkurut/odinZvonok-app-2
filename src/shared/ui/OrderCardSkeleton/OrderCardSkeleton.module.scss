@@ -1,0 +1,79 @@
+@keyframes shimmer {
+    0% {
+        background-position: -200px 0;
+    }
+    100% {
+        background-position: calc(200px + 100%) 0;
+    }
+}
+
+.skeleton {
+    background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 37%, #e5e7eb 63%);
+    background-size: 400px 100%;
+    animation: shimmer 1.4s ease infinite;
+    border-radius: 8px;
+}
+
+.card {
+    padding: 16px;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+}
+
+.topRow {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.title {
+    @extend .skeleton;
+    height: 16px;
+    width: 65%;
+}
+
+.status {
+    @extend .skeleton;
+    height: 20px;
+    width: 70px;
+    border-radius: 999px;
+}
+
+.description {
+    @extend .skeleton;
+    height: 14px;
+    margin-bottom: 8px;
+}
+
+.descriptionShort {
+    @extend .skeleton;
+    height: 14px;
+    width: 80%;
+    margin-bottom: 12px;
+}
+
+.address {
+    @extend .skeleton;
+    height: 24px;
+    width: 60%;
+    margin-bottom: 14px;
+}
+
+.bottomRow {
+    display: flex;
+    justify-content: space-between;
+}
+
+.date {
+    @extend .skeleton;
+    height: 14px;
+    width: 90px;
+}
+
+.master {
+    @extend .skeleton;
+    height: 14px;
+    width: 120px;
+}

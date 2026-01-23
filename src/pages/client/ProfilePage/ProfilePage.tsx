@@ -5,85 +5,154 @@ import Logo from "../../../assets/Logo.png";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/shared/hooks";
 import { useEffect, useState } from "react";
-import { fetchMe, fetchLogout } from "@/store/slices/authSlice";
+import { fetchMe, fetchLogout, completeRegistration } from "@/store/slices/authSlice";
 import { Modal } from "@/shared/ui/Modal";
+import { getAvatarUploadUrl } from "@/store/slices/filesSlice";
+import axios from "axios";
+import { ProfileSkeleton } from "@/shared/ui/ProfileSkeleton/ProfileSkeleton";
+
+type ProfileForm = {
+    first_name: string;
+    last_name: string;
+    middle_name: string;
+    phone_number: string;
+    email: string;
+    address: string;
+    profile_photo_url: string;
+};
+
+const LABELS: Record<keyof ProfileForm, string> = {
+    first_name: "Имя",
+    last_name: "Фамилия",
+    middle_name: "Отчество",
+    phone_number: "Телефон",
+    email: "Email",
+    address: "Адрес",
+    profile_photo_url: "Фотография профиля",
+};
 
 export const ProfilePage = () => {
     const { user, loading, error } = useAppSelector((state) => state.auth);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
+
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [isLogoutOpen, setIsLogoutOpen] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [uploading, setUploading] = useState(false);
+    const [uploadedPhotoUrl, setUploadedPhotoUrl] = useState<string>("");
 
-    // console.log(user, "ssdsdsd");
+    const [form, setForm] = useState<ProfileForm>({
+        profile_photo_url: "",
+        first_name: "",
+        last_name: "",
+        middle_name: "",
+        phone_number: "",
+        email: "",
+        address: "",
+    });
 
-    // Загружаем профиль, если его нет
+    // ===== LOAD PROFILE =====
     useEffect(() => {
         if (!user && !loading) {
             dispatch(fetchMe());
         }
     }, [dispatch, user, loading]);
 
-    const handleLogout = async () => {
-        try {
-            await dispatch(fetchLogout()).unwrap();
-            navigate("/");
-        } catch (err) {
-            console.error("Ошибка выхода:", err);
+    // ===== FILL FORM =====
+    useEffect(() => {
+        if (isEditOpen && user) {
+            setForm({
+                profile_photo_url: user.profile_photo_url ?? "",
+                first_name: user.first_name ?? "",
+                last_name: user.last_name ?? "",
+                middle_name: user.middle_name ?? "",
+                phone_number: user.phone_number ?? "",
+                email: user.email ?? "",
+                address: user.address ?? "",
+            });
+        }
+    }, [isEditOpen, user]);
+
+    const handleChange = (key: keyof ProfileForm, value: string) => {
+        setForm((prev) => ({ ...prev, [key]: value }));
+    };
+
+    // ===== HANDLE FILE CHANGE AND UPLOAD =====
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            setSelectedFile(file);
+            setUploading(true);
+
+            try {
+                const uploadData = await dispatch(getAvatarUploadUrl()).unwrap();
+
+                // загружаем файл на uploadUrl
+                await axios.put(uploadData.uploadUrl, file, {
+                    headers: { "Content-Type": file.type },
+                });
+
+                // сохраняем accessUrl для отправки в профиль
+                setUploadedPhotoUrl(uploadData.accessUrl);
+            } catch (err) {
+                console.error("Ошибка загрузки фото:", err);
+                alert("Не удалось загрузить фото");
+                setUploadedPhotoUrl("");
+            } finally {
+                setUploading(false);
+            }
         }
     };
 
-    // === ЗАГРУЗКА И ОШИБКИ ===
+    // ===== SAVE PROFILE =====
+    const handleSaveProfile = async () => {
+        if (!form.first_name || !form.last_name || !form.phone_number) {
+            alert("Имя, фамилия и телефон обязательны");
+            return;
+        }
+
+        const payload = {
+            ...form,
+            profile_photo_url: uploadedPhotoUrl || user?.profile_photo_url || "",
+        };
+
+        try {
+            await dispatch(completeRegistration(payload)).unwrap();
+            await dispatch(fetchMe()).unwrap();
+            setIsEditOpen(false);
+            setSelectedFile(null);
+            setUploadedPhotoUrl("");
+        } catch (err) {
+            console.error(err);
+            alert("Не удалось сохранить профиль");
+        }
+    };
+
+    const handleLogout = async () => {
+        await dispatch(fetchLogout()).unwrap();
+        navigate("/");
+    };
+
+    // ===== UI STATES =====
     if (loading) {
-        return <div className={styles.loader}>Загрузка профиля...</div>;
+        return <ProfileSkeleton />;
     }
 
-    if (error) {
-        return (
-            <div className={styles.error}>
-                <p>Ошибка загрузки профиля: {error}</p>
-                <button onClick={() => dispatch(fetchMe())}>Повторить</button>
-            </div>
-        );
-    }
+    if (error) return <div className={styles.error}>{error}</div>;
+    if (!user) return <div className={styles.error}>Профиль не найден</div>;
 
-    if (!user) {
-        return <div className={styles.error}>Профиль не найден</div>;
-    }
-
-    // === БЕЗОПАСНОЕ ФОРМИРОВАНИЕ ИМЕНИ ===
     const displayName =
-        user.full_name ||
-        [user.last_name, user.first_name, user.middle_name].filter(Boolean).join(" ") ||
+        user.middle_name ||
+        [user.last_name, user.first_name].filter(Boolean).join(" ") ||
         user.username ||
         "Пользователь";
 
-    // === БЕЗОПАСНОЕ ОТОБРАЖЕНИЕ РОЛИ ===
-    const getRoleText = (role?: string) => {
-        if (!role) return "Роль не указана";
+    const isProfileIncomplete = !user.phone_number;
 
-        const upperRole = role.toUpperCase();
-        switch (upperRole) {
-            case "CLIENT":
-                return "Клиент";
-            case "OPERATOR":
-                return "Оператор";
-            case "MASTER":
-                return "Мастер";
-            default:
-                return role;
-        }
-    };
-
-    const userRoleText = getRoleText(user.role);
-
-    // === РОЛЬ ДЛЯ NAVIGATION (с fallback) ===
-    const navigationRole =
-        user.role?.toLowerCase() === "client" ||
-        user.role?.toLowerCase() === "operator" ||
-        user.role?.toLowerCase() === "master"
-            ? (user.role.toLowerCase() as "client" | "operator" | "master")
-            : "client";
+    const navigationRole = ["client", "operator", "master"].includes(user.role?.toLowerCase())
+        ? (user.role!.toLowerCase() as "client" | "operator" | "master")
+        : "client";
 
     return (
         <div className={styles.profilePage}>
@@ -91,15 +160,14 @@ export const ProfilePage = () => {
                 <Link to="/client">
                     <img src={Logo} alt="Логотип" />
                 </Link>
-                <h1 className={styles.pageTitle}>Профиль</h1>
+                <h1>Профиль</h1>
             </header>
 
             <main className={styles.main}>
-                {/* Карточка пользователя */}
                 <Card className={styles.userCard}>
                     <div className={styles.userAvatar}>
-                        {user.profile_photo_url && user.profile_photo_url !== "string" ? (
-                            <img src={user.profile_photo_url} alt="Аватар" />
+                        {user.profile_photo_url ? (
+                            <img src={user.profile_photo_url} alt="avatar" />
                         ) : (
                             <User size={32} />
                         )}
@@ -107,134 +175,95 @@ export const ProfilePage = () => {
 
                     <div className={styles.userInfo}>
                         <h2>{displayName}</h2>
-                        <p className={styles.userRole}>{userRoleText}</p>
+                        <p>{user.role}</p>
                     </div>
 
-                    <Button
-                        variant="secondary"
-                        size="small"
-                        className={styles.editBtn}
-                        onClick={() => setIsEditOpen(true)}
-                    >
+                    <Button size="small" variant="secondary" onClick={() => setIsEditOpen(true)}>
                         Редактировать <Edit size={16} />
                     </Button>
                 </Card>
 
-                {/* Контактная информация */}
                 <section className={styles.contactSection}>
                     <h3>Контактная информация</h3>
 
                     {user.phone_number && (
-                        <Card className={styles.contactCard}>
-                            <div className={styles.contactIcon}>
-                                <Phone size={20} />
-                            </div>
-                            <div className={styles.contactInfo}>
-                                <label>Телефон</label>
-                                <span>{user.phone_number}</span>
-                            </div>
+                        <Card>
+                            <Phone /> {user.phone_number}
                         </Card>
                     )}
 
                     {user.email && (
-                        <Card className={styles.contactCard}>
-                            <div className={styles.contactIcon}>
-                                <Mail size={20} />
-                            </div>
-                            <div className={styles.contactInfo}>
-                                <label>Email</label>
-                                <span>{user.email}</span>
-                            </div>
+                        <Card>
+                            <Mail /> {user.email}
                         </Card>
                     )}
 
-                    {user.address && user.address !== "string" && (
-                        <Card className={styles.contactCard}>
-                            <div className={styles.contactIcon}>
-                                <Mail size={20} />
-                            </div>
-                            <div className={styles.contactInfo}>
-                                <label>Адрес</label>
-                                <span>{user.address}</span>
-                            </div>
-                        </Card>
-                    )}
-
-                    {!user.phone_number && !user.email && !user.address && (
-                        <Card className={styles.contactCard}>
-                            <p className={styles.noContact}>Контактные данные не указаны</p>
+                    {isProfileIncomplete && (
+                        <Card className={styles.warningCard}>
+                            <p>⚠️ Профиль заполнен не полностью</p>
+                            <Button onClick={() => setIsEditOpen(true)}>Завершить регистрацию</Button>
                         </Card>
                     )}
                 </section>
 
-                <div className={styles.actions}>
-                    <Button variant="danger" size="large" onClick={() => setIsLogoutOpen(true)}>
-                        <LogOut size={20} style={{ marginRight: 8 }} />
-                        Выйти из аккаунта
-                    </Button>
-                </div>
+                <Button variant="danger" onClick={() => setIsLogoutOpen(true)}>
+                    <LogOut /> Выйти
+                </Button>
             </main>
 
+            {/* ===== EDIT MODAL ===== */}
             <Modal
                 isOpen={isEditOpen}
                 onClose={() => setIsEditOpen(false)}
-                title="Редактирование профиля"
+                title="Заполнение профиля"
                 footer={
                     <>
                         <Button variant="secondary" onClick={() => setIsEditOpen(false)}>
                             Отмена
                         </Button>
-                        <Button>Сохранить</Button>
+                        <Button onClick={handleSaveProfile}>Сохранить</Button>
                     </>
                 }
             >
-                <div className={styles.editForm}>
-                    <div className={styles.formGroup}>
-                        <label>Имя</label>
-                        <input defaultValue={user.first_name || ""} />
-                    </div>
-
-                    <div className={styles.formGroup}>
-                        <label>Фамилия</label>
-                        <input defaultValue={user.last_name || ""} />
-                    </div>
-
-                    <div className={styles.formGroup}>
-                        <label>Телефон</label>
-                        <input defaultValue={user.phone_number || ""} />
-                    </div>
-
-                    <div className={styles.formGroup}>
-                        <label>Email</label>
-                        <input defaultValue={user.email || ""} />
-                    </div>
-
-                    <div className={styles.formGroup}>
-                        <label>Адрес</label>
-                        <input defaultValue={user.address || ""} />
-                    </div>
+                <div className={styles.formGroup}>
+                    <label>Фотография профиля</label>
+                    <input type="file" accept="image/*" onChange={handleFileChange} />
+                    {uploading && <p>Загрузка...</p>}
+                    {uploadedPhotoUrl && !uploading && <p>Файл загружен ✅</p>}
                 </div>
+
+                {(Object.keys(form) as (keyof ProfileForm)[]).map((key) =>
+                    key !== "profile_photo_url" ? (
+                        <div key={key} className={styles.formGroup}>
+                            <label>{LABELS[key]}</label>
+                            <input
+                                type={key === "phone_number" ? "tel" : "text"}
+                                value={form[key]}
+                                onChange={(e) => handleChange(key, e.target.value)}
+                            />
+                        </div>
+                    ) : null,
+                )}
             </Modal>
 
-            <div className={styles.logoutModal}>
-                <Modal
-                    isOpen={isLogoutOpen}
-                    onClose={() => setIsLogoutOpen(false)}
-                    title="Выход из аккаунта"
-                    footer={
-                        <>
-                            <Button variant="secondary" onClick={() => setIsLogoutOpen(false)}>
-                                Отмена
-                            </Button>
-                            <Button variant="danger" onClick={handleLogout}>
-                                Выйти
-                            </Button>
-                        </>
-                    }
-                >
-                    <p className={styles.logoutText}>Вы действительно хотите выйти из аккаунта?</p>
-                </Modal>
-            </div>
+            {/* ===== LOGOUT MODAL ===== */}
+            <Modal
+                isOpen={isLogoutOpen}
+                onClose={() => setIsLogoutOpen(false)}
+                title="Выход"
+                footer={
+                    <>
+                        <Button variant="secondary" onClick={() => setIsLogoutOpen(false)}>
+                            Отмена
+                        </Button>
+                        <Button variant="danger" onClick={handleLogout}>
+                            Выйти
+                        </Button>
+                    </>
+                }
+            >
+                Вы уверены, что хотите выйти?
+            </Modal>
 
             <Navigation role={navigationRole} />
         </div>

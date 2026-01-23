@@ -176,3 +176,14 @@ export interface IUpdateProfileRequest {
     address?: string;
     profile_photo_url?: string;
 }
+
+// тарифы
+export interface Tariff {
+    id: string;
+    name: string;
+    description: string;
+    price: string;
+    billingPeriod: string;
+    features: string[];
+    active: boolean;
+}

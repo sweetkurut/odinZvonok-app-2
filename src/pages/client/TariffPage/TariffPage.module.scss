@@ -1,133 +1,145 @@
 .tariffPage {
-  min-height: 100vh;
-  padding-bottom: 80px;
+    min-height: 100vh;
+    padding-bottom: 80px;
+    background: #f6f7f9;
 }
 
 .header {
-  background: var(--tg-theme-button-color);
-  color: white;
-  padding: 16px 20px;
-  text-align: center;
-  
-  h1 {
-    font-size: 20px;
-    font-weight: 600;
-  }
+    color: #333;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #0000001f;
+    text-align: center;
+
+    h1 {
+        font-size: 20px;
+        font-weight: 600;
+    }
 }
 
 .main {
-  padding: 20px;
+    padding: 20px;
 }
 
 .tariffsList {
-  margin-bottom: 24px;
+    margin-bottom: 24px;
 }
 
 .tariffCard {
-  position: relative;
-  
-  &.recommended {
-    border: 2px solid var(--tg-theme-button-color);
-  }
-}
-
-.recommendedBadge {
-  position: absolute;
-  top: -10px;
-  right: 16px;
-  background: var(--tg-theme-button-color);
-  color: white;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.tariffHeader {
-  text-align: center;
-  margin-bottom: 20px;
-  
-  h3 {
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 8px;
-  }
-}
-
-.tariffPrice {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  
-  .price {
-    font-size: 24px;
-    font-weight: bold;
-    color: var(--tg-theme-text-color);
-  }
-  
-  .period {
-    font-size: 14px;
-    color: var(--tg-theme-hint-color);
-  }
-}
-
-.tariffFeatures {
-  margin-bottom: 20px;
-}
-
-.feature {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-  font-size: 14px;
-  
-  .checkIcon {
-    color: #4caf50;
-    flex-shrink: 0;
-  }
-}
-
-.tariffActions {
-  text-align: center;
-}
-
-.currentCard {
-  text-align: center;
-  
-  h3 {
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 8px;
-  }
-  
-  p {
-    color: var(--tg-theme-button-color);
-    font-weight: 500;
+    background: #ffffff;
+    border-radius: 20px;
+    // padding: 14px;
     margin-bottom: 16px;
-  }
+    border: 1px solid #e9ecef;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    position: relative;
+    transition: all 0.2s ease;
+
+    // &.active {
+    //     border: 2px solid #2481cc; // Цвет Telegram
+    //     box-shadow: 0 8px 20px rgba(36, 129, 204, 0.1);
+    // }
 }
 
-.tariffDetails {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
 }
 
-.detail {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  
-  span:first-child {
-    font-size: 12px;
-    color: var(--tg-theme-hint-color);
-  }
-  
-  span:last-child {
-    font-size: 16px;
-    font-weight: 500;
-    color: var(--tg-theme-text-color);
-  }
+.overline {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    color: #adb5bd;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
+
+.tariffName {
+    font-size: 22px;
+    font-weight: 800;
+    color: #212529;
+    margin: 0;
+}
+
+.priceWrapper {
+    text-align: right;
+    .priceValue {
+        display: block;
+        font-size: 20px;
+        font-weight: 800;
+        color: #2481cc;
+    }
+    .pricePeriod {
+        font-size: 12px;
+        color: #868e96;
+    }
+}
+
+.description {
+    font-size: 14px;
+    color: #495057;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.featuresList {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 24px;
+}
+
+.featureItem {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    color: #343a40;
+
+    .checkIconWrapper {
+        width: 20px;
+        height: 20px;
+        background: #e7f5ff; // Светло-голубой фон под галочку
+        color: #2481cc;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+}
+
+.actionButton {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    background: #030303;
+    color: white;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    font-family: "Montserrat", sans-serif;
+    transition: transform 0.1s ease;
+
+    // &:active {
+    //     transform: scale(0.98);
+    // }
+
+    &.activeButton {
+        font-family: "Montserrat", sans-serif;
+        // background: #f8f9fa;
+        color: #adb5bd;
+        border: 1px solid #dee2e6;
+        cursor: default;
+
+        &:hover {
+            background: #000000;
+        }
+    }
 }

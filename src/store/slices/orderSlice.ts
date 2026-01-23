@@ -8,7 +8,9 @@ type OrdersState = {
     creating: boolean;
     error: string | null;
     createError: string | null;
-    orders: Order[] | null; // ← массив заказов
+    orders: Order[] | null;
+    orderDetails: Order | null;
+    isInitialLoading: boolean;
 };
 
 const initialState: OrdersState = {
@@ -17,6 +19,8 @@ const initialState: OrdersState = {
     error: null,
     createError: null,
     orders: null,
+    orderDetails: null,
+    isInitialLoading: true,
 };
 
 export const fetchOrders = createAsyncThunk<Order[], void, { rejectValue: string }>(
@@ -33,7 +37,24 @@ export const fetchOrders = createAsyncThunk<Order[], void, { rejectValue: string
             console.error("fetchOrders error:", error);
             return rejectWithValue(error?.response?.data?.message || "Ошибка загрузки заказов");
         }
-    }
+    },
+);
+
+// детальная информация
+export const fetchOrderById = createAsyncThunk<Order, string, { rejectValue: string }>(
+    "orders/fetchOrderById",
+    async (orderId, { rejectWithValue }) => {
+        try {
+            const res = await storesApi.getOrderById(orderId);
+            if (res.status !== 200) {
+                return rejectWithValue(`Ошибка сервера: ${res.status}`);
+            }
+            return res.data;
+        } catch (error: any) {
+            console.error("fetchOrderById error:", error);
+            return rejectWithValue(error?.response?.data?.message || "Ошибка загрузки заказа");
+        }
+    },
 );
 
 // Если createOrder возвращает полный заказ — аналогично
@@ -50,7 +71,7 @@ export const createOrder = createAsyncThunk<Order, CreateOrder, { rejectValue: s
             console.error("createOrder error:", error);
             return rejectWithValue(error?.response?.data?.message || "Ошибка создания заказа");
         }
-    }
+    },
 );
 
 const ordersSlice = createSlice({
@@ -70,11 +91,27 @@ const ordersSlice = createSlice({
             .addCase(fetchOrders.fulfilled, (state, action) => {
                 state.loading = false;
                 state.orders = action.payload;
+                state.isInitialLoading = false;
             })
             .addCase(fetchOrders.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload || "Ошибка загрузки заказов";
+                state.isInitialLoading = false;
             })
+
+            .addCase(fetchOrderById.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchOrderById.fulfilled, (state, action) => {
+                state.loading = false;
+                state.orderDetails = action.payload;
+            })
+            .addCase(fetchOrderById.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || "Ошибка загрузки заказа";
+            })
+
             .addCase(createOrder.pending, (state) => {
                 state.creating = true;
                 state.createError = null;

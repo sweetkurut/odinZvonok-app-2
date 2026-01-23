@@ -1,0 +1,105 @@
+@keyframes shimmer {
+    0% {
+        background-position: -200px 0;
+    }
+    100% {
+        background-position: calc(200px + 100%) 0;
+    }
+}
+
+.skeleton {
+    background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 37%, #e5e7eb 63%);
+    background-size: 400px 100%;
+    animation: shimmer 1.4s ease infinite;
+    border-radius: 8px;
+}
+
+.page {
+    min-height: 100vh;
+    background: #f6f7f9;
+}
+
+.header {
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #0000001f;
+}
+
+.logo {
+    @extend .skeleton;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+}
+
+.title {
+    @extend .skeleton;
+    width: 100px;
+    height: 20px;
+}
+
+.main {
+    padding: 20px;
+}
+
+.userCard {
+    background: #fff;
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 24px;
+}
+
+.avatar {
+    @extend .skeleton;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+}
+
+.name {
+    @extend .skeleton;
+    width: 140px;
+    height: 18px;
+}
+
+.role {
+    @extend .skeleton;
+    width: 80px;
+    height: 14px;
+}
+
+.button {
+    @extend .skeleton;
+    width: 120px;
+    height: 36px;
+    border-radius: 10px;
+}
+
+.section {
+    margin-bottom: 24px;
+}
+
+.sectionTitle {
+    @extend .skeleton;
+    width: 180px;
+    height: 16px;
+    margin-bottom: 12px;
+}
+
+.contact {
+    @extend .skeleton;
+    height: 48px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+}
+
+.logoutButton {
+    @extend .skeleton;
+    height: 48px;
+    border-radius: 14px;
+}

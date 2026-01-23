@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import type { IRefreshTokenResponse } from "../types";
+import type { IRefreshTokenResponse, IUpdateProfileRequest } from "../types";
 import { storesApi } from "@/api";
 
 // Интерфейс пользователя из ответа /auth/telegram
@@ -45,6 +46,7 @@ type AuthState = {
     error: string | null;
     user: IUser | null;
     isAuthenticated: boolean;
+    isInitialLoading: boolean;
 };
 
 const initialState: AuthState = {
@@ -52,6 +54,7 @@ const initialState: AuthState = {
     error: null,
     user: null,
     isAuthenticated: false,
+    isInitialLoading: true,
 };
 
 /* ===================== THUNKS ===================== */
@@ -71,7 +74,7 @@ export const fetchTelegramAuth = createAsyncThunk<ITelegramAuthResponse, string,
             const message = e.response?.data?.message || "Ошибка авторизации через Telegram";
             return rejectWithValue(message);
         }
-    }
+    },
 );
 
 // Получение свежего профиля (если нужно)
@@ -86,7 +89,7 @@ export const fetchMe = createAsyncThunk<IUser, void, { rejectValue: string }>(
 
             return rejectWithValue("Не удалось загрузить профиль");
         }
-    }
+    },
 );
 
 // Refresh токена
@@ -103,7 +106,30 @@ export const fetchRefreshToken = createAsyncThunk<IRefreshTokenResponse, void, {
             removeTokens();
             return rejectWithValue("Сессия истекла");
         }
-    }
+    },
+);
+
+export const completeRegistration = createAsyncThunk(
+    "auth/completeRegistration",
+    async (
+        data: {
+            first_name: string;
+            last_name: string;
+            middle_name?: string;
+            phone_number: string;
+            email?: string;
+            address?: string;
+            profile_photo_url: string;
+        },
+        { rejectWithValue },
+    ) => {
+        try {
+            const res = await storesApi.completeRegistration(data);
+            return res.data;
+        } catch (e: any) {
+            return rejectWithValue(e.response?.data?.message || "Ошибка завершения регистрации");
+        }
+    },
 );
 
 // Logout
@@ -146,9 +172,17 @@ const authSlice = createSlice({
             })
 
             // fetchMe
+            .addCase(fetchMe.pending, (state) => {
+                state.loading = true;
+            })
             .addCase(fetchMe.fulfilled, (state, action) => {
+                state.loading = false;
                 state.user = action.payload;
-                state.isAuthenticated = true;
+                state.isInitialLoading = false;
+            })
+            .addCase(fetchMe.rejected, (state) => {
+                state.loading = false;
+                state.isInitialLoading = false;
             })
 
             // Refresh & Logout
@@ -160,6 +194,20 @@ const authSlice = createSlice({
             .addCase(fetchLogout.fulfilled, (state) => {
                 state.user = null;
                 state.isAuthenticated = false;
+            })
+            // completeRegistration
+            .addCase(completeRegistration.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(completeRegistration.fulfilled, (state, action) => {
+                state.loading = false;
+                state.user = action.payload;
+                state.isAuthenticated = true;
+            })
+            .addCase(completeRegistration.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || "Ошибка сохранения профиля";
             });
     },
 });

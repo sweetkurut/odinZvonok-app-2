@@ -58,7 +58,24 @@ export const storesApi = {
             });
     },
 
+    getOrderById(orderId: string) {
+        return instance.get(`/orders/${orderId}`);
+    },
+
     createOrder(orderData: CreateOrder) {
         return instance.post<Orders>("/orders", orderData);
+    },
+
+    // createOrder(formData: FormData) {
+    //     return instance.post<Orders>("/orders", formData, {
+    //         headers: {
+    //             "Content-Type": "multipart/form-data",
+    //         },
+    //     });
+    // },
+
+    // тарифы
+    getTariffs() {
+        return instance.get("/tariffs");
     },
 };
