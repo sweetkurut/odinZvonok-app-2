@@ -28,7 +28,7 @@ export const AppRouter = () => {
 
             {/* Client Routes */}
             <Route path="/client" element={<ClientHomePage />} />
-            {/* <Route path="/client/help" element={<ClientHelpPage />} /> */}
+            <Route path="/client/help" element={<ClientHelpPage />} />
             <Route path="/client/tariffs" element={<TariffPage />} />
             <Route path="/client/history" element={<ClientHistoryPage />} />
             <Route path="/client/history/:id" element={<DetailOrderPage />} />
