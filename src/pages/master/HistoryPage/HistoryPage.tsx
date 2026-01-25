@@ -1,97 +1,125 @@
 import { Navigation, Card } from "../../../shared/ui";
-import { Star } from "lucide-react";
 import styles from "./HistoryPage.module.scss";
-import { Link, useNavigate } from "react-router-dom";
 import Logo from "../../../assets/Logo.png";
+import { Link, useNavigate } from "react-router-dom";
+import type { RootState } from "@/store";
+import { useAppDispatch, useAppSelector } from "@/shared/hooks";
+import { useEffect } from "react";
+import { fetchOrders } from "@/store/slices/orderSlice";
+import { OrderCardSkeleton } from "@/shared/ui/OrderCardSkeleton/OrderCardSkeleton";
 
 export const HistoryPage = () => {
-    const nav = useNavigate();
+    const dispatch = useAppDispatch();
+    const { orders, loading, isInitialLoading, error } = useAppSelector((state: RootState) => state.orders);
 
-    const handleCardClick = (orderId: string) => {
-        nav(`/master/order/${orderId}`);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (isInitialLoading) {
+            dispatch(fetchOrders());
+        }
+    }, [dispatch, isInitialLoading]);
+
+    const getStatusText = (status: string) => {
+        switch (status) {
+            case "COMPLETED":
+            case "completed":
+                return "Завершён";
+            case "CANCELLED":
+            case "cancelled":
+                return "Отменён";
+            case "IN_PROGRESS":
+            case "in_progress":
+                return "В работе";
+            case "PENDING_ASSIGNMENT":
+                return "Ожидает мастера";
+            default:
+                return "Ожидает";
+        }
     };
 
-    const orders = [
-        {
-            id: "1",
-            client: "Alex Alexandr",
-            rating: 4.9,
-            date: "2024-01-15",
-            category: "Бытовая техника",
-            description: "Ремонт стиральной машины",
-            completedTime: "10:00-12",
-            status: "completed",
-        },
-        {
-            id: "2",
-            client: "Alex Alexandr",
-            rating: 5.0,
-            date: "2024-01-14",
-            category: "Сантехника",
-            description: "Замена крана",
-            completedTime: "14:00-15:30",
-            status: "completed",
-        },
-    ];
+    if (isInitialLoading && loading) {
+        return (
+            <div className={styles.historyPage}>
+                <header className={styles.header}>
+                    <Link to="/master">
+                        <img src={Logo} alt="Логотип" />
+                    </Link>
+                    <h1>История заказов</h1>
+                </header>
+
+                <main className={styles.main}>
+                    <div className={styles.ordersList}>
+                        {Array.from({ length: 4 }).map((_, i) => (
+                            <OrderCardSkeleton key={i} />
+                        ))}
+                    </div>
+                </main>
+
+                <Navigation role="master" />
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className={styles.error}>
+                <p>Ошибка: {error}</p>
+                <button onClick={() => dispatch(fetchOrders())}>Повторить</button>
+            </div>
+        );
+    }
 
     return (
         <div className={styles.historyPage}>
             <header className={styles.header}>
-                <div className={styles.userInfo}>
-                    <Link to={"/master"}>
-                        <img src={Logo} alt="" />
-                    </Link>
-                </div>
-                <div>
-                    {/* <h1 className={styles.userName}>{user?.name}</h1> */}
-                    <h1 className={styles.userName}>История сделок</h1>
-                </div>
+                <Link to={"/master"}>
+                    <img src={Logo} alt="Логотип" />
+                </Link>
+                <h1>История заказов</h1>
             </header>
 
             <main className={styles.main}>
-                <div className={styles.ordersList}>
-                    {orders.map((order) => (
-                        <Card key={order.id} className={styles.orderCard} onClick={handleCardClick}>
-                            <div className={styles.orderHeader}>
-                                <div className={styles.clientInfo}>
-                                    <div className={styles.clientAvatar}>
-                                        <span>
-                                            {order.client
-                                                .split(" ")
-                                                .map((n) => n[0])
-                                                .join("")}
-                                        </span>
-                                    </div>
-                                    <div className={styles.clientDetails}>
-                                        <h3>{order.client}</h3>
-                                        <div className={styles.rating}>
-                                            <Star size={14} className={styles.star} />
-                                            <span>{order.rating}</span>
-                                        </div>
-                                        <div className={styles.orderMeta}>
-                                            <span>{order.category}</span>
-                                            <span>•</span>
-                                            <span>Оценка клиенту: {order.rating}</span>
-                                        </div>
-                                        <div className={styles.orderTime}>
-                                            <span>
-                                                Дата выполнения:{" "}
-                                                {new Date(order.date).toLocaleDateString("ru-RU")}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className={styles.orderStatus}>
-                                    <span className={styles.statusCompleted}>Завершен</span>
-                                </div>
-                            </div>
-                        </Card>
-                    ))}
-                </div>
-
-                {orders.length === 0 && (
+                {!orders || orders.length === 0 ? (
                     <div className={styles.emptyState}>
-                        <p>У вас пока нет выполненных заказов</p>
+                        <p>У вас пока нет заказов</p>
+                        {/* <button onClick={handleNavigate}>Добавить</button> */}
+                    </div>
+                ) : (
+                    <div className={styles.ordersList}>
+                        {orders.map((order) => (
+                            <Card
+                                key={order.id}
+                                className={styles.orderCard}
+                                onClick={() => navigate(`/master/history/${order.id}`)}
+                            >
+                                <div className={styles.topRow}>
+                                    <h3 className={styles.title}>{order.title || "Без заголовка"}</h3>
+
+                                    <span
+                                        className={`${styles.status} ${styles[order.status?.toLowerCase()]}`}
+                                    >
+                                        {getStatusText(order.status)}
+                                    </span>
+                                </div>
+
+                                <p className={styles.description}>
+                                    {order.description || "Описание отсутствует"}
+                                </p>
+
+                                {order.address && <div className={styles.address}>📍 {order.address}</div>}
+
+                                <div className={styles.bottomRow}>
+                                    <span className={styles.date}>
+                                        {new Date(order.created_at).toLocaleDateString("ru-RU")}
+                                    </span>
+
+                                    {order.master && (
+                                        <span className={styles.master}>👨‍🔧 {order.master.fullName}</span>
+                                    )}
+                                </div>
+                            </Card>
+                        ))}
                     </div>
                 )}
             </main>

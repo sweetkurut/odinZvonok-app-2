@@ -1,38 +1,46 @@
 import { Navigation, Card, Button } from "../../../shared/ui";
 import { Link, useNavigate } from "react-router-dom";
-import { Clock, User, MapPin } from "lucide-react";
 import styles from "./HomePage.module.scss";
 import Logo from "../../../assets/Logo.png";
+import { useAppDispatch, useAppSelector } from "@/shared/hooks";
+import { useEffect } from "react";
+import { fetchAllOrders } from "@/store/slices/orderSlice";
+import type { RootState } from "@/store";
+import { OrderCardSkeleton } from "@/shared/ui/OrderCardSkeleton/OrderCardSkeleton";
 
 export const HomePage = () => {
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+    const { orders, loading, isInitialLoading, error } = useAppSelector((state: RootState) => state.orders);
 
-    const currentOrders = [
-        {
-            id: "1",
-            title: "Ремонт бытовой техники",
-            client: "Alex Master",
-            address: "ул. Советская, 15",
-            time: "4:1 ○",
-            category: "Бытовая техника",
-        },
-        {
-            id: "2",
-            title: "Сантехника",
-            client: "Alex Master",
-            address: "ул. Советская, 15",
-            time: "4:1 ○",
-            category: "Сантехника",
-        },
-        {
-            id: "3",
-            title: "Электрика",
-            client: "Alex Master",
-            address: "ул. Советская, 15",
-            time: "4:1 ○",
-            category: "Электрика",
-        },
-    ];
+    useEffect(() => {
+        if (isInitialLoading) {
+            dispatch(fetchAllOrders());
+        }
+    }, [dispatch, isInitialLoading]);
+
+    if (isInitialLoading && loading) {
+        return (
+            <div className={styles.historyPage}>
+                <header className={styles.header}>
+                    <Link to="/client">
+                        <img src={Logo} alt="Логотип" />
+                    </Link>
+                    <h1>История заказов</h1>
+                </header>
+
+                <main className={styles.main}>
+                    <div className={styles.ordersList}>
+                        {Array.from({ length: 4 }).map((_, i) => (
+                            <OrderCardSkeleton key={i} />
+                        ))}
+                    </div>
+                </main>
+
+                <Navigation role="client" />
+            </div>
+        );
+    }
 
     return (
         <div className={styles.homePage}>
@@ -49,7 +57,7 @@ export const HomePage = () => {
             </header>
 
             <main className={styles.main}>
-                <div className={styles.filters}>
+                {/* <div className={styles.filters}>
                     <Button variant="primary" size="small">
                         Все категории
                     </Button>
@@ -59,43 +67,56 @@ export const HomePage = () => {
                     <Button variant="secondary" size="small">
                         Сантех
                     </Button>
-                </div>
+                </div> */}
 
                 <section className={styles.currentOrders}>
                     <h2>Текущие сделки</h2>
 
-                    {currentOrders.map((order) => (
-                        <Card
-                            key={order.id}
-                            className={styles.orderCard}
-                            onClick={() => navigate(`/operator/order/${order.id}`)}
-                        >
-                            <div className={styles.orderHeader}>
-                                <h3>{order.category}</h3>
-                                <span className={styles.orderTime}>
-                                    <Clock size={14} />
-                                    {order.time}
-                                </span>
-                            </div>
+                    {!orders || orders.length === 0 ? (
+                        <div className={styles.emptyState}>
+                            <p>Текущих сделок нет</p>
+                        </div>
+                    ) : (
+                        <div className={styles.ordersList}>
+                            {orders.map((order) => (
+                                <Card
+                                    key={order.id}
+                                    className={styles.orderCard}
+                                    // onClick={() => navigate(`/operator/master/:id${order.id}`)}
+                                    // onClick={() => navigate("/operator/order/:id")}
+                                    onClick={() => navigate(`/operator/order/${order.id}`)}
+                                >
+                                    <div className={styles.topRow}>
+                                        <h3 className={styles.title}>{order.title || "Без заголовка"}</h3>
 
-                            <div className={styles.orderInfo}>
-                                <div className={styles.clientInfo}>
-                                    <User size={16} />
-                                    <span>{order.client}</span>
-                                </div>
-                                <div className={styles.addressInfo}>
-                                    <MapPin size={16} />
-                                    <span>{order.address}</span>
-                                </div>
-                            </div>
+                                        {/* <span
+                                            className={`${styles.status} ${styles[order.status?.toLowerCase()]}`}
+                                        >
+                                            {getStatusText(order.status)}
+                                        </span> */}
+                                    </div>
 
-                            <div className={styles.orderActions}>
-                                <Button variant="secondary" size="small">
-                                    Подробнее
-                                </Button>
-                            </div>
-                        </Card>
-                    ))}
+                                    <p className={styles.description}>
+                                        {order.description || "Описание отсутствует"}
+                                    </p>
+
+                                    {order.address && (
+                                        <div className={styles.address}>📍 {order.address}</div>
+                                    )}
+
+                                    <div className={styles.bottomRow}>
+                                        <span className={styles.date}>
+                                            {new Date(order.created_at).toLocaleDateString("ru-RU")}
+                                        </span>
+
+                                        {order.master && (
+                                            <span className={styles.master}>👨‍🔧 {order.master.fullName}</span>
+                                        )}
+                                    </div>
+                                </Card>
+                            ))}
+                        </div>
+                    )}
                 </section>
             </main>
 

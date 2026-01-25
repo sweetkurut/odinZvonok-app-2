@@ -86,7 +86,7 @@ export interface Order {
     title: string;
     description: string;
     address: string;
-    status: string; // например "PENDING_ASSIGNMENT"
+    status: string;
     imageUrls: string[];
     client: {
         id: string;
@@ -186,4 +186,13 @@ export interface Tariff {
     billingPeriod: string;
     features: string[];
     active: boolean;
+}
+
+// мастеры
+export interface Master {
+    id: string;
+    fullName: string;
+    profile_photo_url: string;
+    rating: number;
+    completedOrders: number;
 }

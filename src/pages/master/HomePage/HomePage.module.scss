@@ -189,8 +189,13 @@
 
 .callButtons {
     display: flex;
-    justify-content: space-around;
+    // justify-content: space-around;
+    justify-content: center;
+    width: 100%;
     gap: 8px;
+    flex-wrap: wrap;
+    // flex-direction: column;
+    align-items: center;
 }
 
 .actionButton {

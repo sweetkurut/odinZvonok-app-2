@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import type {
     CreateOrder,
     IFullRegisterRequest,
@@ -58,6 +59,11 @@ export const storesApi = {
             });
     },
 
+    // получить все заказы (оператор, админ)
+    getAllOrdersOperatorAdmin(params = {}) {
+        return instance.get<Orders>("/orders/all", { params });
+    },
+
     getOrderById(orderId: string) {
         return instance.get(`/orders/${orderId}`);
     },
@@ -77,5 +83,33 @@ export const storesApi = {
     // тарифы
     getTariffs() {
         return instance.get("/tariffs");
+    },
+
+    //  мастера
+    getMasters() {
+        return instance.get("/masters");
+    },
+
+    getMasterById(userId: string) {
+        return instance.get(`/masters/${userId}`);
+    },
+
+    // Обновить свой статус доступности (для мастеров)
+    updateMasterAvailability(status: boolean) {
+        return instance.patch("/masters/profile/status", { status });
+    },
+
+    // получить все отзыывы о мастере
+    getReviewsByMasterId(masterUserId: string) {
+        return instance.get(`/masters/${masterUserId}/reviews`);
+    },
+
+    // создать или обновить свой профиль мастера
+    upsertMasterProfile(data: FormData) {
+        return instance.put("/masters/profile", data, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        });
     },
 };

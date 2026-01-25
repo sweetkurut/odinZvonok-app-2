@@ -57,6 +57,22 @@ export const fetchOrderById = createAsyncThunk<Order, string, { rejectValue: str
     },
 );
 
+export const fetchAllOrders = createAsyncThunk<Order[], void, { rejectValue: string }>(
+    "orders/fetchAllOrders",
+    async (_, { rejectWithValue }) => {
+        try {
+            const res = await storesApi.getAllOrdersOperatorAdmin();
+            if (res.status !== 200) {
+                return rejectWithValue(`Ошибка сервера: ${res.status}`);
+            }
+            return (res.data as OrdersResponse).content;
+        } catch (error: any) {
+            console.error("fetchAllOrders error:", error);
+            return rejectWithValue(error?.response?.data?.message || "Ошибка загрузки заказов");
+        }
+    },
+);
+
 // Если createOrder возвращает полный заказ — аналогично
 export const createOrder = createAsyncThunk<Order, CreateOrder, { rejectValue: string }>(
     "orders/createOrder",
@@ -94,6 +110,21 @@ const ordersSlice = createSlice({
                 state.isInitialLoading = false;
             })
             .addCase(fetchOrders.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || "Ошибка загрузки заказов";
+                state.isInitialLoading = false;
+            })
+
+            .addCase(fetchAllOrders.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchAllOrders.fulfilled, (state, action) => {
+                state.loading = false;
+                state.orders = action.payload;
+                state.isInitialLoading = false;
+            })
+            .addCase(fetchAllOrders.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload || "Ошибка загрузки заказов";
                 state.isInitialLoading = false;
