@@ -21,6 +21,13 @@
     }
 }
 
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
 .status {
     padding: 4px 10px;
     border-radius: 999px;

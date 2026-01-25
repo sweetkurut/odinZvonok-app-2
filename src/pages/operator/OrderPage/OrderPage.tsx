@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from "@/shared/hooks";
 import { fetchOrderById } from "@/store/slices/orderSlice";
 import { useEffect } from "react";
 import { ORDER_STATUS_MAP } from "@/utils/orderStatus";
+import { OrderPageSkeleton } from "@/shared/ui/OrderPageSkeleton/OrderPageSkeleton";
 
 export const OrderPage = () => {
     const { id } = useParams<{ id: string }>();
@@ -20,7 +21,10 @@ export const OrderPage = () => {
         }
     }, [dispatch, id]);
 
-    if (loading) return <Loader />;
+    if (loading) {
+        return <OrderPageSkeleton />;
+    }
+
     if (error) return <div className={styles.error}>{error}</div>;
     if (!orderDetails) return null;
 
