@@ -1,6 +1,6 @@
 import { Navigation, Card, Button } from "../../../shared/ui";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Phone, MessageCircle, Loader } from "lucide-react";
+import { ArrowLeft, Phone, MessageCircle } from "lucide-react";
 import styles from "./OrderPage.module.scss";
 import { useAppDispatch, useAppSelector } from "@/shared/hooks";
 import { fetchOrderById } from "@/store/slices/orderSlice";

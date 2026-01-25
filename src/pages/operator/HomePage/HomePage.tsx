@@ -1,4 +1,4 @@
-import { Navigation, Card, Button } from "../../../shared/ui";
+import { Navigation, Card } from "../../../shared/ui";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./HomePage.module.scss";
 import Logo from "../../../assets/Logo.png";
@@ -11,7 +11,7 @@ import { OrderCardSkeleton } from "@/shared/ui/OrderCardSkeleton/OrderCardSkelet
 export const HomePage = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    const { orders, loading, isInitialLoading, error } = useAppSelector((state: RootState) => state.orders);
+    const { orders, loading, isInitialLoading } = useAppSelector((state: RootState) => state.orders);
 
     useEffect(() => {
         if (isInitialLoading) {

@@ -1,0 +1,165 @@
+.wrapper {
+    min-height: 100vh;
+    padding-bottom: 80px;
+    // background: #f6f7f9;
+}
+
+.header {
+    color: #333;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #0000001f;
+
+    h1 {
+        font-size: 20px;
+        font-weight: 600;
+    }
+
+    img {
+        height: 50px;
+    }
+}
+
+.mastersList {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+    // padding: 10px;
+}
+
+.filters {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 10px;
+
+    select {
+        border-radius: 20px;
+        padding: 8px 14px;
+        font-size: 13px;
+        border: none;
+        // background: #f1f3f5;
+        // white-space: nowrap;
+        box-shadow: none;
+    }
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 6px;
+}
+
+@media (min-width: 768px) {
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.masterCard {
+    // margin: 10px;
+    background: #fff;
+    border-radius: 16px;
+    padding: 14px 14px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border: 1px solid #e5e7eb;
+
+    // border: none;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+.masterTop {
+    display: flex;
+    gap: 12px;
+}
+
+.masterAvatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--tg-theme-button-color);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.masterDetails {
+    flex: 1;
+
+    h4 {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 2px;
+    }
+}
+
+.masterMeta {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 2px;
+
+    .rating {
+        color: #f5a623;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .category {
+        color: var(--tg-theme-hint-color);
+        font-size: 12px;
+    }
+}
+
+.masterStatus {
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.free {
+    color: #2ea043;
+}
+
+.busy {
+    color: #cf222e;
+}
+
+/* ===== ДЕЙСТВИЯ ===== */
+.masterActions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.iconButton {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #555;
+
+    &:hover {
+        background: #f5f5f5;
+    }
+}
+
+.assignButton {
+    margin-left: auto;
+}

@@ -15,6 +15,8 @@ import { MasterOrderPage } from "../../pages/master/OrderPage";
 import Login from "@/pages/Login/Login";
 import { DetailOrderPage } from "@/pages/client/DetailOrderPage/DetailOrderPage";
 import { TariffPage } from "@/pages/client/TariffPage/TariffPage";
+// import { MasterPage } from "@/pages/operator/MasterPage/MasterPage";
+import MastersListPage from "@/pages/operator/MastersListPage/MastersListPage";
 // import DetailOrderPage from "@/pages/client/DetailOrderPage/DetailOrderPage";
 
 export const AppRouter = () => {
@@ -38,6 +40,7 @@ export const AppRouter = () => {
 
             {/* Operator Routes */}
             <Route path="/operator" element={<OperatorHomePage />} />
+            <Route path="/operator/masters-list" element={<MastersListPage />} />
             <Route path="/operator/order/:id" element={<OperatorOrderPage />} />
             <Route path="/operator/master/:id" element={<OperatorMasterPage />} />
             <Route path="/operator/completed/:id" element={<OperatorCompletedPage />} />
