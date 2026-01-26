@@ -1,0 +1,19 @@
+.wrapper {
+    min-height: 100vh;
+    padding-bottom: 80px;
+}
+
+.header {
+    color: #333;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #0000001f;
+    text-align: center;
+
+    h1 {
+        font-size: 20px;
+        font-weight: 600;
+    }
+}

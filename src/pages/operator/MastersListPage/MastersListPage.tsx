@@ -1,54 +1,47 @@
-import { Button, Card, Navigation } from "@/shared/ui";
+import { Button, Navigation } from "@/shared/ui";
 import styles from "./MastersListPage.module.scss";
 import { Link } from "react-router-dom";
 import Logo from "../../../assets/Logo.png";
-import { MessageCircle, Phone } from "lucide-react";
-import { useMemo, useState } from "react";
-
-const mastersData = [
-    {
-        id: 1,
-        name: "Alex Alexandr",
-        category: "Бытовая техника",
-        rating: 4.9,
-        status: "free",
-    },
-    {
-        id: 2,
-        name: "Ivan Petrov",
-        category: "Электрика",
-        rating: 4.6,
-        status: "busy",
-    },
-    {
-        id: 3,
-        name: "Maria Ivanova",
-        category: "Сантехника",
-        rating: 4.8,
-        status: "free",
-    },
-    {
-        id: 4,
-        name: "Oleg Smirnov",
-        category: "Бытовая техника",
-        rating: 4.3,
-        status: "busy",
-    },
-];
+import { useEffect, useMemo, useState } from "react";
+import MasterCardSkeleton from "@/shared/ui/MasterCardSkeleton/MasterCardSkeleton";
+import { useAppDispatch, useAppSelector } from "@/shared/hooks";
+import { fetchMasters } from "@/store/slices/masterSlice";
 
 const MastersListPage = () => {
     const [category, setCategory] = useState("all");
     const [status, setStatus] = useState("all");
     const [minRating, setMinRating] = useState(0);
+    // const [loading, setLoading] = useState(true);
+
+    const dispatch = useAppDispatch();
+    const { masters, loading } = useAppSelector((state) => state.masters);
+
+    useEffect(() => {
+        dispatch(fetchMasters());
+    }, [dispatch]);
+
+    // useEffect(() => {
+    //     const timer = setTimeout(() => setLoading(false), 1200);
+    //     return () => clearTimeout(timer);
+    // }, []);
 
     const filteredMasters = useMemo(() => {
-        return mastersData.filter((m) => {
-            if (category !== "all" && m.category !== category) return false;
-            if (status !== "all" && m.status !== status) return false;
-            if (m.rating < minRating) return false;
+        return masters?.filter((m) => {
+            // категория = специализация
+            if (category !== "all" && !m.specializations?.includes(category)) return false;
+
+            // статус
+            if (status !== "all") {
+                const uiStatus = m.status === "AVAILABLE" ? "free" : "busy";
+                if (uiStatus !== status) return false;
+            }
+
+            // рейтинг
+            if ((m.rating ?? 0) < minRating) return false;
+
             return true;
         });
-    }, [category, status, minRating]);
+    }, [masters, category, status, minRating]);
 
     return (
         <div className={styles.wrapper}>
@@ -83,49 +76,64 @@ const MastersListPage = () => {
                     </div>
 
                     <div className={styles.grid}>
-                        {filteredMasters.map((master) => (
-                            <div key={master.id} className={styles.masterCard}>
-                                <div className={styles.masterTop}>
-                                    <div className={styles.masterAvatar}>
-                                        {master.name
-                                            .split(" ")
-                                            .map((n) => n[0])
-                                            .join("")}
-                                    </div>
+                        {loading
+                            ? Array.from({ length: 4 }).map((_, idx) => <MasterCardSkeleton key={idx} />)
+                            : filteredMasters?.map((master) => {
+                                  const isFree = master.status === "AVAILABLE";
 
-                                    <div className={styles.masterDetails}>
-                                        <h4>{master.name}</h4>
+                                  return (
+                                      <div key={master.id} className={styles.masterCard}>
+                                          <div className={styles.masterTop}>
+                                              <div className={styles.masterAvatar}>
+                                                  {master.fullName
+                                                      .split(" ")
+                                                      .map((n) => n[0])
+                                                      .join("")}
+                                              </div>
 
-                                        <div className={styles.masterMeta}>
-                                            <span className={styles.rating}>★ {master.rating}</span>
-                                            <span className={styles.category}>{master.category}</span>
-                                        </div>
+                                              <div className={styles.masterDetails}>
+                                                  <h4>{master.fullName}</h4>
 
-                                        <span
-                                            className={`${styles.masterStatus} ${
-                                                master.status === "free" ? styles.free : styles.busy
-                                            }`}
-                                        >
-                                            {master.status === "free" ? "Готов принять заказ" : "Занят"}
-                                        </span>
-                                    </div>
-                                </div>
+                                                  <div className={styles.masterMeta}>
+                                                      <span className={styles.rating}>
+                                                          ★ {master.rating || "Нет рейтинга"}
+                                                      </span>
+                                                      <span className={styles.category}>
+                                                          {master.specializations || "Без категории"}
+                                                      </span>
+                                                  </div>
 
-                                <div className={styles.masterActions}>
-                                    <div className={styles.iconButton}>
-                                        <Phone size={16} />
-                                    </div>
+                                                  <span
+                                                      className={`${styles.masterStatus} ${
+                                                          isFree ? styles.free : styles.busy
+                                                      }`}
+                                                  >
+                                                      {isFree ? "Готов принять заказ" : "Недоступен"}
+                                                  </span>
+                                              </div>
+                                          </div>
 
-                                    <div className={styles.iconButton}>
-                                        <MessageCircle size={16} />
-                                    </div>
+                                          <div className={styles.masterActions}>
+                                              {/* <div className={styles.iconButton}>
+                                                  <Phone size={16} />
+                                              </div>
 
-                                    <Button variant="primary" size="small" className={styles.assignButton}>
-                                        Назначить
-                                    </Button>
-                                </div>
-                            </div>
-                        ))}
+                                              <div className={styles.iconButton}>
+                                                  <MessageCircle size={16} />
+                                              </div> */}
+
+                                              <Button
+                                                  variant="primary"
+                                                  size="small"
+                                                  className={styles.assignButton}
+                                                  disabled={!isFree}
+                                              >
+                                                  Назначить
+                                              </Button>
+                                          </div>
+                                      </div>
+                                  );
+                              })}
                     </div>
                 </div>
             </main>

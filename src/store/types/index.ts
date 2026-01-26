@@ -189,10 +189,42 @@ export interface Tariff {
 }
 
 // мастеры
-export interface Master {
+export type Master = {
     id: string;
     fullName: string;
-    profile_photo_url: string;
     rating: number;
-    completedOrders: number;
-}
+    categories: string[];
+    status: "AVAILABLE" | "busy";
+    specializations?: string[];
+};
+
+export type MasterStatus = "available" | "busy" | "on_way" | "lunch" | "last_call";
+
+export type MasterProfile = {
+    id: string;
+    fullName: string;
+    bio: string;
+    experienceYears: number;
+    specializations: string[];
+    status: MasterStatus;
+    rating: number;
+    dealsCount: number;
+};
+
+export type DealStatus = "on_way" | "in_progress" | "completed";
+
+export type Deal = {
+    id: string;
+    category: string;
+    clientName: string;
+    clientAddress: string;
+    price: number;
+    date: string;
+    rating: number;
+};
+
+export type DealDetails = Deal & {
+    description: string;
+    photos: string[];
+    review?: string;
+};

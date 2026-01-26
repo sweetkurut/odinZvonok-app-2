@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type {
     CreateOrder,
@@ -85,31 +86,38 @@ export const storesApi = {
         return instance.get("/tariffs");
     },
 
-    //  мастера
+    // список мастеров
     getMasters() {
         return instance.get("/masters");
     },
 
+    // профиль текущего мастера
+    getProfileMaster() {
+        return instance.get("/masters/profile");
+    },
+
+    // создать / обновить профиль мастера
+    updateProfileMaster(data: any) {
+        return instance.put("/masters/profile", data);
+    },
+
+    // обновить статус мастера
+    updateMasterStatus(status: "available" | "busy") {
+        return instance.patch("/masters/profile/status", { status });
+    },
+
+    // профиль мастера по ID
     getMasterById(userId: string) {
         return instance.get(`/masters/${userId}`);
     },
 
-    // Обновить свой статус доступности (для мастеров)
-    updateMasterAvailability(status: boolean) {
-        return instance.patch("/masters/profile/status", { status });
-    },
-
-    // получить все отзыывы о мастере
-    getReviewsByMasterId(masterUserId: string) {
+    // отзывы мастера
+    getMasterReviews(masterUserId: string) {
         return instance.get(`/masters/${masterUserId}/reviews`);
     },
 
-    // создать или обновить свой профиль мастера
-    upsertMasterProfile(data: FormData) {
-        return instance.put("/masters/profile", data, {
-            headers: {
-                "Content-Type": "multipart/form-data",
-            },
-        });
+    // оставить отзыв
+    postMasterReview(masterUserId: string, data: any) {
+        return instance.post(`/masters/${masterUserId}/reviews`, data);
     },
 };

@@ -15,9 +15,8 @@ import { MasterOrderPage } from "../../pages/master/OrderPage";
 import Login from "@/pages/Login/Login";
 import { DetailOrderPage } from "@/pages/client/DetailOrderPage/DetailOrderPage";
 import { TariffPage } from "@/pages/client/TariffPage/TariffPage";
-// import { MasterPage } from "@/pages/operator/MasterPage/MasterPage";
 import MastersListPage from "@/pages/operator/MastersListPage/MastersListPage";
-// import DetailOrderPage from "@/pages/client/DetailOrderPage/DetailOrderPage";
+import MasterProfile from "@/pages/master/MasterProfile/MasterProfile";
 
 export const AppRouter = () => {
     return (
@@ -47,6 +46,7 @@ export const AppRouter = () => {
 
             {/* Master Routes */}
             <Route path="/master" element={<MasterHomePage />} />
+            <Route path="/master/profile" element={<MasterProfile />} />
             <Route path="/master/history" element={<MasterHistoryPage />} />
             {/* <Route path="/master/order" element={<MasterOrderPage />} /> */}
             <Route path="/master/order/:id" element={<MasterOrderPage />} />
