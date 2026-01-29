@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { storesApi } from "@/api";
-import type { Master } from "../types";
+import type { Master, MasterStatus } from "../types";
 
 type MasterState = {
     loading: boolean;
@@ -28,25 +28,43 @@ export const fetchMasters = createAsyncThunk("masters/fetchAll", async (_, { rej
     }
 });
 
-export const fetchProfileMaster = createAsyncThunk("masters/profile", async (_, { rejectWithValue }) => {
-    try {
-        const res = await storesApi.getProfileMaster();
-        return res.data;
-    } catch (error: any) {
-        console.error(error);
+export const fetchProfileMaster = createAsyncThunk(
+    "masters/profile",
+    async (userId: string, { rejectWithValue }) => {
+        try {
+            const res = await storesApi.getProfileMaster(userId);
+            return res.data;
+        } catch (error: any) {
+            console.error(error);
 
-        return rejectWithValue("Ошибка загрузки профиля");
-    }
-});
+            return rejectWithValue("Ошибка загрузки профиля");
+        }
+    },
+);
 
 export const updateMasterStatus = createAsyncThunk(
-    "masters/status",
-    async (status: "available" | "busy", { rejectWithValue }) => {
+    "masters/updateStatus",
+    async (status: MasterStatus, { rejectWithValue }) => {
         try {
             const res = await storesApi.updateMasterStatus(status);
             return res.data;
         } catch {
             return rejectWithValue("Ошибка обновления статуса");
+        }
+    },
+);
+
+
+// обновить профиль мастера
+export const updateProfileMaster = createAsyncThunk(
+    "masters/updateProfile",
+    async (data: any, { rejectWithValue }) => {
+        try {
+            const res = await storesApi.updateProfileMaster(data);
+            return res.data;
+        } catch (error) {
+            console.error(error);
+            return rejectWithValue("Ошибка обновления профиля");
         }
     },
 );
@@ -98,6 +116,19 @@ const MasterSlice = createSlice({
             .addCase(updateMasterStatus.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload || "Ошибка обновления статуса";
+            })
+
+            .addCase(updateProfileMaster.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(updateProfileMaster.fulfilled, (state, action) => {
+                state.masters = action.payload;
+                state.loading = false;
+            })
+            .addCase(updateProfileMaster.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || "Ошибка обновления профиля";
             });
     },
 });

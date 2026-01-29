@@ -7,9 +7,10 @@ import { useAppDispatch, useAppSelector } from "@/shared/hooks";
 import { useEffect, useState } from "react";
 import { fetchMe, fetchLogout, completeRegistration } from "@/store/slices/authSlice";
 import { Modal } from "@/shared/ui/Modal";
-import { getAvatarUploadUrl } from "@/store/slices/filesSlice";
+// import { getAvatarUploadUrl } from "@/store/slices/filesSlice";
 import axios from "axios";
 import { ProfileSkeleton } from "@/shared/ui/ProfileSkeleton/ProfileSkeleton";
+import { getAvatarUploadUrl } from "@/store/slices/filesSlice";
 
 type ProfileForm = {
     first_name: string;
@@ -129,7 +130,7 @@ export const MasterProfile = () => {
 
     const handleLogout = async () => {
         await dispatch(fetchLogout()).unwrap();
-        navigate("/");
+        navigate("/master");
     };
 
     // ===== UI STATES =====
@@ -155,7 +156,7 @@ export const MasterProfile = () => {
     return (
         <div className={styles.profilePage}>
             <header className={styles.header}>
-                <Link to="/client">
+                <Link to="/master">
                     <img src={Logo} alt="Логотип" />
                 </Link>
                 <h1>Профиль</h1>

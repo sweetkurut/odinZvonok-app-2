@@ -1,5 +1,5 @@
 import { Navigation, Card, Button } from "../../../shared/ui";
-import { User, Edit, LogOut } from "lucide-react";
+import { User, Phone, Mail, Edit, LogOut } from "lucide-react";
 import styles from "./ProfilePage.module.scss";
 import Logo from "../../../assets/Logo.png";
 import { Link, useNavigate } from "react-router-dom";
@@ -18,63 +18,69 @@ type ProfileForm = {
     phone_number: string;
     email: string;
     address: string;
-    profile_photo_object_name: string;
+    profile_photo_url: string;
+};
+
+const LABELS: Record<keyof ProfileForm, string> = {
+    first_name: "Имя",
+    last_name: "Фамилия",
+    middle_name: "Отчество",
+    phone_number: "Телефон",
+    email: "Email",
+    address: "Адрес",
+    profile_photo_url: "Фотография профиля",
 };
 
 export const ProfilePage = () => {
-    const { user, loading, error } = useAppSelector((s) => s.auth);
+    const { user, loading, error } = useAppSelector((state) => state.auth);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
-
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [isLogoutOpen, setIsLogoutOpen] = useState(false);
-
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [uploading, setUploading] = useState(false);
-    const [uploadedObjectName, setUploadedObjectName] = useState<string>("");
+    const [uploadedPhotoUrl, setUploadedPhotoUrl] = useState<string>("");
+    const [isProfileIncomplete, setIsProfileIncomplete] = useState(false);
 
-    const [avatarUrl, setAvatarUrl] = useState<string>("");
+    const displayName = user
+        ? `${user.first_name || ""} ${user.last_name || ""} ${user.middle_name || ""}`.trim()
+        : "";
 
     const [form, setForm] = useState<ProfileForm>({
+        profile_photo_url: "",
         first_name: "",
         last_name: "",
         middle_name: "",
         phone_number: "",
         email: "",
         address: "",
-        profile_photo_object_name: "",
     });
 
     // ===== LOAD PROFILE =====
     useEffect(() => {
-        if (!user && !loading) dispatch(fetchMe());
+        if (!user && !loading) {
+            dispatch(fetchMe());
+        }
     }, [dispatch, user, loading]);
 
     // ===== FILL FORM =====
     useEffect(() => {
         if (isEditOpen && user) {
             setForm({
+                profile_photo_url: user.profile_photo_url ?? "",
                 first_name: user.first_name ?? "",
                 last_name: user.last_name ?? "",
                 middle_name: user.middle_name ?? "",
                 phone_number: user.phone_number ?? "",
                 email: user.email ?? "",
                 address: user.address ?? "",
-                profile_photo_object_name: user.profile_photo_object_name ?? "",
             });
         }
     }, [isEditOpen, user]);
 
-    // ===== LOAD AVATAR =====
-    useEffect(() => {
-        if (!user?.profile_photo_object_name) return;
-
-        axios
-            .get("/api/files/download-url", {
-                params: { objectName: user.profile_photo_object_name },
-            })
-            .then((res) => setAvatarUrl(res.data.downloadUrl))
-            .catch(() => setAvatarUrl(""));
-    }, [user?.profile_photo_object_name]);
+    const handleChange = (key: keyof ProfileForm, value: string) => {
+        setForm((prev) => ({ ...prev, [key]: value }));
+    };
 
     // ===== FILE UPLOAD =====
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -92,7 +98,7 @@ export const ProfilePage = () => {
                 headers: { "Content-Type": file.type },
             });
 
-            setUploadedObjectName(uploadData.objectName);
+            setUploadedPhotoUrl(uploadData.objectName);
         } catch {
             alert("Ошибка загрузки аватара");
         } finally {
@@ -102,16 +108,21 @@ export const ProfilePage = () => {
 
     // ===== SAVE PROFILE =====
     const handleSaveProfile = async () => {
-        const payload = {
-            ...form,
-            profile_photo_object_name: uploadedObjectName || user?.profile_photo_object_name || "",
-        };
-
-        await dispatch(completeRegistration(payload)).unwrap();
-        await dispatch(fetchMe()).unwrap();
-
-        setIsEditOpen(false);
-        setUploadedObjectName("");
+        if (!form.first_name || !form.last_name || !form.phone_number) {
+            alert("Имя, фамилия и телефон обязательны");
+            return;
+        }
+        const payload = { ...form, profile_photo_url: uploadedPhotoUrl || user?.profile_photo_url || "" };
+        try {
+            await dispatch(completeRegistration(payload)).unwrap();
+            await dispatch(fetchMe()).unwrap();
+            setIsEditOpen(false);
+            setSelectedFile(null);
+            setUploadedPhotoUrl("");
+        } catch (err) {
+            console.error(err);
+            alert("Не удалось сохранить профиль");
+        }
     };
 
     const handleLogout = async () => {
@@ -131,33 +142,54 @@ export const ProfilePage = () => {
                 </Link>
                 <h1>Профиль</h1>
             </header>
-
             <main className={styles.main}>
                 <Card className={styles.userCard}>
                     <div className={styles.userAvatar}>
-                        {avatarUrl ? <img src={avatarUrl} /> : <User size={32} />}
+                        {user.profile_photo_url ? (
+                            <img src={user.profile_photo_url} alt="avatar" />
+                        ) : (
+                            <User size={32} />
+                        )}
                     </div>
-
                     <div className={styles.userInfo}>
-                        <h2>{[user.last_name, user.first_name].filter(Boolean).join(" ")}</h2>
-                        <p>{user.role}</p>
+                        <h2>{displayName}</h2> <p>{user.role}</p>
                     </div>
-
-                    <Button onClick={() => setIsEditOpen(true)}>
+                    <Button size="small" variant="secondary" onClick={() => setIsEditOpen(true)}>
                         Редактировать <Edit size={16} />
                     </Button>
                 </Card>
-
-                <Button variant="secondary" onClick={() => setIsLogoutOpen(true)}>
+                <section className={styles.contactSection}>
+                    <h3>Контактная информация</h3>
+                    {user.phone_number && (
+                        <Card className={styles.contactCard}>
+                            <Phone /> {user.phone_number}
+                        </Card>
+                    )}
+                    {user.email && (
+                        <Card className={styles.contactCard}>
+                            <Mail /> {user.email}
+                        </Card>
+                    )}
+                    {isProfileIncomplete && (
+                        <Card className={styles.warningCard}>
+                            <p>⚠️ Профиль заполнен не полностью</p>
+                            <Button onClick={() => setIsEditOpen(true)}>Завершить регистрацию</Button>
+                        </Card>
+                    )}
+                </section>
+                <Button
+                    variant="secondary"
+                    onClick={() => setIsLogoutOpen(true)}
+                    className={styles.logoutButton}
+                >
                     <LogOut /> Выйти
                 </Button>
             </main>
-
-            {/* EDIT MODAL */}
+            {/* ===== EDIT MODAL ===== */}
             <Modal
                 isOpen={isEditOpen}
                 onClose={() => setIsEditOpen(false)}
-                title="Редактирование профиля"
+                title="Заполнение профиля"
                 footer={
                     <>
                         <Button variant="secondary" onClick={() => setIsEditOpen(false)}>
@@ -167,12 +199,26 @@ export const ProfilePage = () => {
                     </>
                 }
             >
-                <input type="file" accept="image/*" onChange={handleFileChange} />
-                {uploading && <p>Загрузка...</p>}
-                {uploadedObjectName && <p>Фото загружено ✅</p>}
+                <div className={styles.formGroup}>
+                    <label>Фотография профиля</label>
+                    <input type="file" accept="image/*" onChange={handleFileChange} />
+                    {uploading && <p>Загрузка...</p>}
+                    {uploadedPhotoUrl && !uploading && <p>Файл загружен ✅</p>}
+                </div>
+                {(Object.keys(form) as (keyof ProfileForm)[]).map((key) =>
+                    key !== "profile_photo_url" ? (
+                        <div key={key} className={styles.formGroup}>
+                            <label>{LABELS[key]}</label>
+                            <input
+                                type={key === "phone_number" ? "tel" : "text"}
+                                value={form[key]}
+                                onChange={(e) => handleChange(key, e.target.value)}
+                            />
+                        </div>
+                    ) : null,
+                )}
             </Modal>
-
-            {/* LOGOUT MODAL */}
+            {/* ===== LOGOUT MODAL ===== */}
             <Modal
                 isOpen={isLogoutOpen}
                 onClose={() => setIsLogoutOpen(false)}
@@ -190,8 +236,7 @@ export const ProfilePage = () => {
             >
                 Вы уверены, что хотите выйти?
             </Modal>
-
-            <Navigation role={user.role} />
+            <Navigation role="client" />
         </div>
     );
 };

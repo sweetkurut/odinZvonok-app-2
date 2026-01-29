@@ -196,9 +196,10 @@ export type Master = {
     categories: string[];
     status: "AVAILABLE" | "busy";
     specializations?: string[];
+    profile_photo_url?: string;
 };
 
-export type MasterStatus = "available" | "busy" | "on_way" | "lunch" | "last_call";
+export type MasterStatus = "AVAILABLE" | "ON_CALL" | "ON_BREAK" | "LAST_CALL";
 
 export type MasterProfile = {
     id: string;

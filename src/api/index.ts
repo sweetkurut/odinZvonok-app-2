@@ -6,6 +6,7 @@ import type {
     IQuickRegisterRequest,
     ITelegramAuthRequest,
     IUpdateProfileRequest,
+    MasterStatus,
     Orders,
 } from "@/store/types";
 import instance from "./axiosInstance";
@@ -92,8 +93,8 @@ export const storesApi = {
     },
 
     // профиль текущего мастера
-    getProfileMaster() {
-        return instance.get("/masters/profile");
+    getProfileMaster(userId: string) {
+        return instance.get(`/masters/profile/${userId}`);
     },
 
     // создать / обновить профиль мастера
@@ -101,8 +102,8 @@ export const storesApi = {
         return instance.put("/masters/profile", data);
     },
 
-    // обновить статус мастера
-    updateMasterStatus(status: "available" | "busy") {
+    // storesApi.ts
+    updateMasterStatus(status: MasterStatus) {
         return instance.patch("/masters/profile/status", { status });
     },
 
