@@ -35,6 +35,7 @@ export const Navigation = ({ role }: NavigationProps) => {
                 return [
                     { path: "/master", icon: Home, label: "Главная" },
                     { path: "/master/history", icon: History, label: "История" },
+                    { path: "/master/reviews", icon: FileText, label: "Отзывы" },
                     { path: "/master/profile", icon: User, label: "Профиль" },
                 ];
 

@@ -4,16 +4,15 @@ import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/tool
 import axios from "axios";
 
 interface UploadUrlResponse {
-    uploadUrl: string; // куда загружаем
-    accessUrl: string; // ссылка для профиля
-    objectName?: string; // ID
+    uploadUrl: string;
+    objectName: string;
 }
 
 interface FilesState {
     orderImageUploadUrl: string | null;
     orderAccessUrl: string | null;
     avatarUploadUrl: string | null;
-    avatarAccessUrl: string | null;
+    avatarObjectName: string | null;
 
     loading: boolean;
     error: string | null;
@@ -24,7 +23,7 @@ const initialState: FilesState = {
     orderImageUploadUrl: null,
     orderAccessUrl: null,
     avatarUploadUrl: null,
-    avatarAccessUrl: null,
+    avatarObjectName: null,
     loading: false,
     error: null,
     lastOperation: "idle",
@@ -44,14 +43,17 @@ export const getOrderImageUploadUrl = createAsyncThunk<UploadUrlResponse, void, 
     },
 );
 
-export const getAvatarUploadUrl = createAsyncThunk<UploadUrlResponse, void, { rejectValue: string }>(
+export const getAvatarUploadUrl = createAsyncThunk<UploadUrlResponse, string, { rejectValue: string }>(
     "files/getAvatarUploadUrl",
-    async (_, { rejectWithValue }) => {
+    async (extension, { rejectWithValue }) => {
         try {
-            const response = await axios.post<UploadUrlResponse>("/api/files/upload-url/avatar");
-            return response.data;
+            const res = await axios.post<UploadUrlResponse>(
+                `/api/files/upload-url/avatar?extension=${extension}`,
+            );
+            return res.data;
         } catch (err: any) {
-            return rejectWithValue(err.response?.data?.message || "Не удалось получить URL для аватара");
+            console.error(err);
+            return rejectWithValue("Не удалось получить URL загрузки аватара");
         }
     },
 );
@@ -64,7 +66,7 @@ const fileSlice = createSlice({
             state.orderImageUploadUrl = null;
             state.orderAccessUrl = null;
             state.avatarUploadUrl = null;
-            state.avatarAccessUrl = null;
+            state.avatarObjectName = null;
             state.error = null;
         },
         clearError(state) {
@@ -94,18 +96,15 @@ const fileSlice = createSlice({
             .addCase(getAvatarUploadUrl.pending, (state) => {
                 state.loading = true;
                 state.error = null;
-                state.lastOperation = "pending";
             })
             .addCase(getAvatarUploadUrl.fulfilled, (state, action: PayloadAction<UploadUrlResponse>) => {
                 state.loading = false;
                 state.avatarUploadUrl = action.payload.uploadUrl;
-                state.avatarAccessUrl = action.payload.accessUrl;
-                state.lastOperation = "succeeded";
+                state.avatarObjectName = action.payload.objectName;
             })
             .addCase(getAvatarUploadUrl.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.payload as string;
-                state.lastOperation = "failed";
+                state.error = action.payload || "Ошибка";
             });
     },
 });

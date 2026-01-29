@@ -27,7 +27,6 @@ const MastersListPage = () => {
 
     const filteredMasters = useMemo(() => {
         return masters?.filter((m) => {
-            // категория = специализация
             if (category !== "all" && !m.specializations?.includes(category)) return false;
 
             // статус

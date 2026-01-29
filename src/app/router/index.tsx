@@ -17,6 +17,7 @@ import { DetailOrderPage } from "@/pages/client/DetailOrderPage/DetailOrderPage"
 import { TariffPage } from "@/pages/client/TariffPage/TariffPage";
 import MastersListPage from "@/pages/operator/MastersListPage/MastersListPage";
 import MasterProfile from "@/pages/master/MasterProfile/MasterProfile";
+import ReviewsPage from "@/pages/master/ReviewsPage/ReviewsPage";
 
 export const AppRouter = () => {
     return (
@@ -48,6 +49,7 @@ export const AppRouter = () => {
             <Route path="/master" element={<MasterHomePage />} />
             <Route path="/master/profile" element={<MasterProfile />} />
             <Route path="/master/history" element={<MasterHistoryPage />} />
+            <Route path="/master/reviews" element={<ReviewsPage />} />
             {/* <Route path="/master/order" element={<MasterOrderPage />} /> */}
             <Route path="/master/order/:id" element={<MasterOrderPage />} />
         </Routes>
