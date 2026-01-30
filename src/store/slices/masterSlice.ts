@@ -1,136 +1,86 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { storesApi } from "@/api";
-import type { Master, MasterStatus } from "../types";
+
+export type MasterStatus = "ONLINE" | "OFFLINE";
+
+export interface Master {
+    id: string;
+    userId: string;
+    first_name: string;
+    last_name: string;
+    phone_number: string;
+    status: MasterStatus;
+    specializations: string[];
+    profile_photo_object_name?: string;
+}
 
 type MasterState = {
     loading: boolean;
-    creating: boolean;
     error: string | null;
-    masters: Master[] | null;
-    isInitialLoading: boolean;
+    profile: Master | null;
 };
 
 const initialState: MasterState = {
     loading: false,
-    creating: false,
     error: null,
-    masters: null,
-    isInitialLoading: true,
+    profile: null,
 };
 
-export const fetchMasters = createAsyncThunk("masters/fetchAll", async (_, { rejectWithValue }) => {
-    try {
-        const res = await storesApi.getMasters();
-        return res.data;
-    } catch (e: any) {
-        return rejectWithValue(e?.response?.data?.message || "Ошибка загрузки мастеров");
-    }
-});
-
 export const fetchProfileMaster = createAsyncThunk(
-    "masters/profile",
+    "masters/fetchProfile",
     async (userId: string, { rejectWithValue }) => {
         try {
             const res = await storesApi.getProfileMaster(userId);
             return res.data;
-        } catch (error: any) {
-            console.error(error);
-
+        } catch {
             return rejectWithValue("Ошибка загрузки профиля");
         }
     },
 );
 
-export const updateMasterStatus = createAsyncThunk(
-    "masters/updateStatus",
-    async (status: MasterStatus, { rejectWithValue }) => {
-        try {
-            const res = await storesApi.updateMasterStatus(status);
-            return res.data;
-        } catch {
-            return rejectWithValue("Ошибка обновления статуса");
-        }
-    },
-);
-
-
-// обновить профиль мастера
 export const updateProfileMaster = createAsyncThunk(
     "masters/updateProfile",
-    async (data: any, { rejectWithValue }) => {
+    async (data: Partial<Master>, { rejectWithValue }) => {
         try {
             const res = await storesApi.updateProfileMaster(data);
             return res.data;
-        } catch (error) {
-            console.error(error);
+        } catch {
             return rejectWithValue("Ошибка обновления профиля");
         }
     },
 );
 
-const MasterSlice = createSlice({
+const mastersSlice = createSlice({
     name: "masters",
     initialState,
     reducers: {},
     extraReducers: (builder) => {
         builder
-            .addCase(fetchMasters.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(fetchMasters.fulfilled, (state, action) => {
-                state.loading = false;
-                state.masters = action.payload;
-                state.isInitialLoading = false;
-            })
-            .addCase(fetchMasters.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload || "Ошибка загрузки тарифов";
-                state.isInitialLoading = false;
-            })
-
             .addCase(fetchProfileMaster.pending, (state) => {
                 state.loading = true;
-                state.error = null;
             })
             .addCase(fetchProfileMaster.fulfilled, (state, action) => {
                 state.loading = false;
-                state.masters = action.payload;
-                state.isInitialLoading = false;
+                state.profile = action.payload;
             })
             .addCase(fetchProfileMaster.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.payload || "Ошибка загрузки профиля";
-                state.isInitialLoading = false;
-            })
-
-            .addCase(updateMasterStatus.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(updateMasterStatus.fulfilled, (state, action) => {
-                state.masters = action.payload;
-                state.loading = false;
-            })
-            .addCase(updateMasterStatus.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload || "Ошибка обновления статуса";
+                state.error = action.payload as string;
             })
 
             .addCase(updateProfileMaster.pending, (state) => {
                 state.loading = true;
-                state.error = null;
             })
             .addCase(updateProfileMaster.fulfilled, (state, action) => {
-                state.masters = action.payload;
                 state.loading = false;
+                state.profile = action.payload;
             })
             .addCase(updateProfileMaster.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.payload || "Ошибка обновления профиля";
+                state.error = action.payload as string;
             });
     },
 });
-// export const {} = MasterSlice.actions;
-export default MasterSlice.reducer;
+
+export default mastersSlice.reducer;

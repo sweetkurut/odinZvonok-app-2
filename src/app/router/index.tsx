@@ -16,9 +16,9 @@ import Login from "@/pages/Login/Login";
 import { DetailOrderPage } from "@/pages/client/DetailOrderPage/DetailOrderPage";
 import { TariffPage } from "@/pages/client/TariffPage/TariffPage";
 import MastersListPage from "@/pages/operator/MastersListPage/MastersListPage";
-import MasterProfile from "@/pages/master/MasterProfile/MasterProfile";
 import ReviewsPage from "@/pages/master/ReviewsPage/ReviewsPage";
 import { RoleLayout } from "@/RoleLayout";
+import { MasterProfile } from "@/pages/master/MasterProfile/MasterProfile";
 
 export const AppRouter = () => {
     return (

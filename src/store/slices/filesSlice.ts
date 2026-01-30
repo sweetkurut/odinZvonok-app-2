@@ -51,18 +51,17 @@ export const getAvatarUploadUrl = createAsyncThunk<UploadUrlResponse, string, { 
                 `/api/files/upload-url/avatar?extension=${extension}`,
             );
             return res.data;
-        } catch (err: any) {
-            console.error(err);
-            return rejectWithValue("Не удалось получить URL загрузки аватара");
+        } catch {
+            return rejectWithValue("Не удалось получить upload URL");
         }
     },
 );
 
 const fileSlice = createSlice({
-    name: "file",
+    name: "files",
     initialState,
     reducers: {
-        clearUploadUrls(state) {
+        clearFilesState(state) {
             state.orderImageUploadUrl = null;
             state.orderAccessUrl = null;
             state.avatarUploadUrl = null;
@@ -95,7 +94,6 @@ const fileSlice = createSlice({
         builder
             .addCase(getAvatarUploadUrl.pending, (state) => {
                 state.loading = true;
-                state.error = null;
             })
             .addCase(getAvatarUploadUrl.fulfilled, (state, action: PayloadAction<UploadUrlResponse>) => {
                 state.loading = false;
@@ -109,6 +107,5 @@ const fileSlice = createSlice({
     },
 });
 
-export const { clearUploadUrls, clearError } = fileSlice.actions;
-
+export const { clearFilesState } = fileSlice.actions;
 export default fileSlice.reducer;
