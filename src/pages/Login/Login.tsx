@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchTelegramAuth, fetchMe } from "@/store/slices/authSlice";
 import FullRegistrationForm from "@/widgets/FullRegistrationForm/FullRegistrationForm";
-import { saveTokens } from "@/utils/auth"; // твой файл с токенами
+import { saveTokens } from "@/utils/auth";
 import styles from "./style.module.scss";
 import Loader from "@/shared/ui/Loader/Loader";
 

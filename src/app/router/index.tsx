@@ -19,6 +19,7 @@ import MastersListPage from "@/pages/operator/MastersListPage/MastersListPage";
 import ReviewsPage from "@/pages/master/ReviewsPage/ReviewsPage";
 import { RoleLayout } from "@/RoleLayout";
 import { MasterProfile } from "@/pages/master/MasterProfile/MasterProfile";
+import { HistoryPage } from "@/pages/operator/HistoryPage/HistoryPage";
 
 export const AppRouter = () => {
     return (
@@ -43,6 +44,7 @@ export const AppRouter = () => {
             <Route element={<RoleLayout role="operator" />}>
                 <Route path="/operator" element={<OperatorHomePage />} />
                 <Route path="/operator/masters-list" element={<MastersListPage />} />
+                <Route path="/operator/history" element={<HistoryPage />} />
                 <Route path="/operator/order/:id" element={<OperatorOrderPage />} />
                 <Route path="/operator/master/:id" element={<OperatorMasterPage />} />
                 <Route path="/operator/completed/:id" element={<OperatorCompletedPage />} />

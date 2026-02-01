@@ -90,6 +90,63 @@ export const createOrder = createAsyncThunk<Order, CreateOrder, { rejectValue: s
     },
 );
 
+// назначие мастера на заказ
+export const assignMasterToOrder = createAsyncThunk<
+    Order,
+    { orderId: string; masterId: string },
+    { rejectValue: string }
+>("orders/assignMasterToOrder", async ({ orderId, masterId }, { rejectWithValue }) => {
+    try {
+        const res = await storesApi.assignmetnOrderMaster(orderId, masterId);
+        return res.data;
+    } catch (error: any) {
+        console.error("assignMasterToOrder error:", error);
+        return rejectWithValue(error?.response?.data?.message || "Не удалось назначить мастера на заказ");
+    }
+});
+
+// Подтверждение цены оператором
+export const confirmOrderPrice = createAsyncThunk<Order, { orderId: string }, { rejectValue: string }>(
+    "orders/confirmOrderPrice",
+    async ({ orderId }, { rejectWithValue }) => {
+        try {
+            const res = await storesApi.confirmPrice(orderId);
+            return res.data;
+        } catch (error: any) {
+            console.error("confirmOrderPrice error:", error);
+            return rejectWithValue(error?.response?.data?.message || "Не удалось подтвердить цену");
+        }
+    },
+);
+
+// Завершение заказа
+export const completeOrder = createAsyncThunk<Order, { orderId: string }, { rejectValue: string }>(
+    "orders/completeOrder",
+    async ({ orderId }, { rejectWithValue }) => {
+        try {
+            const res = await storesApi.completeOrder(orderId);
+            return res.data;
+        } catch (error: any) {
+            console.error("completeOrder error:", error);
+            return rejectWithValue(error?.response?.data?.message || "Не удалось завершить заказ");
+        }
+    },
+);
+
+// Отмена заказа
+export const cancelOrder = createAsyncThunk<Order, { orderId: string }, { rejectValue: string }>(
+    "orders/cancelOrder",
+    async ({ orderId }, { rejectWithValue }) => {
+        try {
+            const res = await storesApi.cancelOrder(orderId);
+            return res.data;
+        } catch (error: any) {
+            console.error("cancelOrder error:", error);
+            return rejectWithValue(error?.response?.data?.message || "Не удалось отменить заказ");
+        }
+    },
+);
+
 const ordersSlice = createSlice({
     name: "orders",
     initialState,
@@ -137,10 +194,11 @@ const ordersSlice = createSlice({
             .addCase(fetchOrderById.fulfilled, (state, action) => {
                 state.loading = false;
                 state.orderDetails = action.payload;
+                state.error = null;
             })
             .addCase(fetchOrderById.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.payload || "Ошибка загрузки заказа";
+                state.error = action.payload as string;
             })
 
             .addCase(createOrder.pending, (state) => {
@@ -158,6 +216,59 @@ const ordersSlice = createSlice({
             .addCase(createOrder.rejected, (state, action) => {
                 state.creating = false;
                 state.createError = action.payload || "Не удалось создать заказ";
+            })
+
+            .addCase(assignMasterToOrder.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(assignMasterToOrder.fulfilled, (state, action) => {
+                state.loading = false;
+                state.orderDetails = action.payload;
+            })
+            .addCase(assignMasterToOrder.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || "Ошибка назначения мастера";
+            })
+
+            .addCase(confirmOrderPrice.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(confirmOrderPrice.fulfilled, (state, action) => {
+                state.loading = false;
+                state.orderDetails = action.payload;
+            })
+            .addCase(confirmOrderPrice.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || "Ошибка подтверждения цены";
+            })
+
+            // Завершение заказа
+            .addCase(completeOrder.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(completeOrder.fulfilled, (state, action) => {
+                state.loading = false;
+                state.orderDetails = action.payload;
+            })
+            .addCase(completeOrder.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || "Ошибка завершения заказа";
+            })
+
+            // Отмена заказа
+            .addCase(cancelOrder.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(cancelOrder.fulfilled, (state, action) => {
+                state.loading = false;
+                state.orderDetails = action.payload;
+            })
+            .addCase(cancelOrder.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || "Ошибка отмены заказа";
             });
     },
 });

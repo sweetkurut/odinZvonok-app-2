@@ -15,4 +15,8 @@ export const ORDER_STATUS_MAP: Record<string, { label: string; className: string
         label: "Отменён",
         className: "canceled",
     },
+    ASSIGNED: {
+        label: "Назначен",
+        className: "assigned",
+    },
 };

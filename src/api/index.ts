@@ -74,6 +74,27 @@ export const storesApi = {
         return instance.post<Orders>("/orders", orderData);
     },
 
+    // назначение мастеара на заказа
+
+    assignmetnOrderMaster(orderId: string, masterId: string) {
+        return instance.post(`/orders/${orderId}/assign-master/${masterId}`);
+    },
+
+    // Оператор подтверждает цену, предложенную мастером.
+    confirmPrice(orderId: string) {
+        return instance.post(`/orders/${orderId}/confirm-price`);
+    },
+
+    // Мастер или оператор/админ меняет статус заказа на 'Выполнен'.
+    completeOrder(orderId: string) {
+        return instance.post(`/orders/${orderId}/complete`);
+    },
+
+    // Любой участник сделки или оператор/админ может отменить заказ, если он еще не завершен.
+    cancelOrder(orderId: string) {
+        return instance.post(`/orders/${orderId}/cancel`);
+    },
+
     // createOrder(formData: FormData) {
     //     return instance.post<Orders>("/orders", formData, {
     //         headers: {

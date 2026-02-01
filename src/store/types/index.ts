@@ -210,7 +210,13 @@ export type MasterProfile = {
     status: MasterStatus;
     rating: number;
     dealsCount: number;
+    profile_photo_url?: string | null;
 };
+
+export interface MasterHomeView extends MasterProfile {
+    completedOrdersCount?: number;
+    reviewCount?: number;
+}
 
 export type DealStatus = "on_way" | "in_progress" | "completed";
 

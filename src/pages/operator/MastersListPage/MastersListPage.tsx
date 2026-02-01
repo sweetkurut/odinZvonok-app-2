@@ -12,6 +12,7 @@ const MastersListPage = () => {
     const [status, setStatus] = useState("all");
     const [minRating, setMinRating] = useState(0);
     // const [loading, setLoading] = useState(true);
+    
 
     const dispatch = useAppDispatch();
     const { masters, loading } = useAppSelector((state) => state.masters);

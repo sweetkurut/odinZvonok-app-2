@@ -26,6 +26,8 @@ export const Navigation = ({ role }: NavigationProps) => {
                     // { path: "/operator", icon: Home, label: "Главная" },
                     // список активных заказов
                     { path: "/operator", icon: FileText, label: "Сделки" },
+                    // /operator/master
+                    { path: "/operator/history", icon: History, label: "История сделок" },
                     { path: "/operator/masters-list", icon: UsersIcon, label: "Мастера" },
                     // выполненные
                     { path: "/operator/completed/1", icon: History, label: "Завершённые" },

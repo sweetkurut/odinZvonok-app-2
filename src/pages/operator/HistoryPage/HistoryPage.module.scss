@@ -1,0 +1,124 @@
+.historyPage {
+    min-height: 100vh;
+    padding-bottom: 80px;
+    // background: #f6f7f9;
+}
+
+.header {
+    color: #333;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #0000001f;
+    text-align: center;
+
+    h1 {
+        font-size: 20px;
+        font-weight: 600;
+    }
+}
+
+.main {
+    padding: 20px;
+}
+
+.ordersList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.orderCard {
+    .orderHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+}
+
+.clientInfo {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    flex: 1;
+}
+
+.clientAvatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--tg-theme-button-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    font-size: 12px;
+    flex-shrink: 0;
+}
+
+.clientDetails {
+    flex: 1;
+
+    h3 {
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 4px;
+    }
+}
+
+.rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 4px;
+
+    .star {
+        color: #ffa500;
+        fill: #ffa500;
+    }
+
+    span {
+        font-size: 12px;
+        color: var(--tg-theme-text-color);
+        font-weight: 500;
+    }
+}
+
+.orderMeta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--tg-theme-hint-color);
+    margin-bottom: 4px;
+
+    span {
+        &:nth-child(2) {
+            color: #ddd;
+        }
+    }
+}
+
+.orderTime {
+    font-size: 12px;
+    color: var(--tg-theme-hint-color);
+}
+
+.orderStatus {
+    .statusCompleted {
+        background: #e8f5e8;
+        color: #4caf50;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+}
+
+.emptyState {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--tg-theme-hint-color);
+}

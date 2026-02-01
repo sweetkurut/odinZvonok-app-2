@@ -1,0 +1,1 @@
+export { HistoryPage as MasterHistoryPage } from './HistoryPage';

@@ -1,25 +1,15 @@
+import { useEffect, useState } from "react";
+import { useAppDispatch, useAppSelector } from "@/shared/hooks";
+import { fetchMe, fetchLogout, completeRegistration } from "@/store/slices/authSlice";
 import { Navigation, Card, Button } from "../../../shared/ui";
-import { User, Edit, LogOut } from "lucide-react";
+import { User, Edit, LogOut, Star } from "lucide-react";
 import styles from "./MasterProfile.module.scss";
 import Logo from "../../../assets/Logo.png";
 import { Link, useNavigate } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "@/shared/hooks";
-import { useEffect, useState } from "react";
-import { fetchMe, fetchLogout, completeRegistration } from "@/store/slices/authSlice";
 import { Modal } from "@/shared/ui/Modal";
 import { getAvatarUploadUrl } from "@/store/slices/filesSlice";
 import axios from "axios";
 import { ProfileSkeleton } from "@/shared/ui/ProfileSkeleton/ProfileSkeleton";
-
-type ProfileForm = {
-    first_name: string;
-    last_name: string;
-    middle_name: string;
-    phone_number: string;
-    email: string;
-    address: string;
-    profile_photo_object_name: string;
-};
 
 export const MasterProfile = () => {
     const { user, loading, error } = useAppSelector((s) => s.auth);
@@ -28,13 +18,10 @@ export const MasterProfile = () => {
 
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [isLogoutOpen, setIsLogoutOpen] = useState(false);
-
     const [uploading, setUploading] = useState(false);
-    const [uploadedObjectName, setUploadedObjectName] = useState<string>("");
-
-    const [avatarUrl, setAvatarUrl] = useState<string>("");
-
-    const [form, setForm] = useState<ProfileForm>({
+    const [uploadedObjectName, setUploadedObjectName] = useState("");
+    const [avatarUrl, setAvatarUrl] = useState("");
+    const [form, setForm] = useState({
         first_name: "",
         last_name: "",
         middle_name: "",
@@ -44,12 +31,10 @@ export const MasterProfile = () => {
         profile_photo_object_name: "",
     });
 
-    // ===== LOAD PROFILE =====
     useEffect(() => {
         if (!user && !loading) dispatch(fetchMe());
     }, [dispatch, user, loading]);
 
-    // ===== FILL FORM =====
     useEffect(() => {
         if (isEditOpen && user) {
             setForm({
@@ -64,54 +49,43 @@ export const MasterProfile = () => {
         }
     }, [isEditOpen, user]);
 
-    // ===== LOAD AVATAR =====
     useEffect(() => {
         if (!user?.profile_photo_object_name) return;
-
         axios
-            .get("/api/files/download-url", {
-                params: { objectName: user.profile_photo_object_name },
-            })
+            .get("/api/files/download-url", { params: { objectName: user.profile_photo_object_name } })
             .then((res) => setAvatarUrl(res.data.downloadUrl))
             .catch(() => setAvatarUrl(""));
     }, [user?.profile_photo_object_name]);
 
-    // ===== FILE UPLOAD =====
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (!e.target.files?.[0]) return;
-
-        const file = e.target.files[0];
+        const file = e.target.files?.[0];
+        if (!file) return;
         const ext = file.name.split(".").pop();
-
         setUploading(true);
-
         try {
             const uploadData = await dispatch(getAvatarUploadUrl(ext!)).unwrap();
-
-            await axios.put(uploadData.uploadUrl, file, {
-                headers: { "Content-Type": file.type },
-            });
-
+            await axios.put(uploadData.uploadUrl, file, { headers: { "Content-Type": file.type } });
             setUploadedObjectName(uploadData.objectName);
         } catch {
-            alert("Ошибка загрузки аватара");
+            alert("Ошибка загрузки фото");
         } finally {
             setUploading(false);
         }
     };
 
-    // ===== SAVE PROFILE =====
-    const handleSaveProfile = async () => {
+    const handleSave = async () => {
         const payload = {
             ...form,
             profile_photo_object_name: uploadedObjectName || user?.profile_photo_object_name || "",
         };
-
-        await dispatch(completeRegistration(payload)).unwrap();
-        await dispatch(fetchMe()).unwrap();
-
-        setIsEditOpen(false);
-        setUploadedObjectName("");
+        try {
+            await dispatch(completeRegistration(payload)).unwrap();
+            await dispatch(fetchMe()).unwrap();
+            setIsEditOpen(false);
+            setUploadedObjectName("");
+        } catch (err) {
+            alert("Не удалось сохранить");
+        }
     };
 
     const handleLogout = async () => {
@@ -120,40 +94,54 @@ export const MasterProfile = () => {
     };
 
     if (loading) return <ProfileSkeleton />;
-    if (error) return <div className={styles.error}>{error}</div>;
-    if (!user) return <div>Профиль не найден</div>;
+    if (error) return <div className={styles.error}>Ошибка: {error}</div>;
+    if (!user) return <div>Профиль не загружен</div>;
 
     return (
         <div className={styles.profilePage}>
             <header className={styles.header}>
-                <Link to="/client">
+                <Link to="/master">
                     <img src={Logo} alt="Логотип" />
                 </Link>
-                <h1>Профиль</h1>
+                <h1>Профиль мастера</h1>
             </header>
 
             <main className={styles.main}>
-                <Card className={styles.userCard}>
-                    <div className={styles.userAvatar}>
-                        {avatarUrl ? <img src={avatarUrl} /> : <User size={32} />}
+                <Card className={styles.profileCard}>
+                    <div className={styles.avatarSection}>
+                        {avatarUrl ? (
+                            <img src={avatarUrl} alt="Аватар" className={styles.avatar} />
+                        ) : (
+                            <User size={64} />
+                        )}
                     </div>
 
-                    <div className={styles.userInfo}>
-                        <h2>{[user.last_name, user.first_name].filter(Boolean).join(" ")}</h2>
-                        <p>{user.role}</p>
+                    <div className={styles.infoSection}>
+                        <h2>
+                            {user.last_name} {user.first_name} {user.middle_name}
+                        </h2>
+                        <div className={styles.meta}>
+                            <div>
+                                <Star size={18} fill="#f59e0b" color="#f59e0b" /> 4.7 (пока заглушка)
+                            </div>
+                            <div>Опыт: 5 лет (пока заглушка)</div>
+                        </div>
+                        <p className={styles.bio}>
+                            Коротко о себе: делаю быстро и качественно (пока заглушка)
+                        </p>
                     </div>
 
                     <Button onClick={() => setIsEditOpen(true)}>
-                        Редактировать <Edit size={16} />
+                        <Edit size={16} /> Редактировать профиль
                     </Button>
                 </Card>
 
                 <Button variant="secondary" onClick={() => setIsLogoutOpen(true)}>
-                    <LogOut /> Выйти
+                    <LogOut size={18} /> Выйти
                 </Button>
             </main>
 
-            {/* EDIT MODAL */}
+            {/* Модалка редактирования */}
             <Modal
                 isOpen={isEditOpen}
                 onClose={() => setIsEditOpen(false)}
@@ -163,20 +151,43 @@ export const MasterProfile = () => {
                         <Button variant="secondary" onClick={() => setIsEditOpen(false)}>
                             Отмена
                         </Button>
-                        <Button onClick={handleSaveProfile}>Сохранить</Button>
+                        <Button onClick={handleSave} disabled={uploading}>
+                            Сохранить
+                        </Button>
                     </>
                 }
             >
-                <input type="file" accept="image/*" onChange={handleFileChange} />
-                {uploading && <p>Загрузка...</p>}
-                {uploadedObjectName && <p>Фото загружено ✅</p>}
+                <div className={styles.formGroup}>
+                    <label>Фото профиля</label>
+                    <input type="file" accept="image/*" onChange={handleFileChange} />
+                    {uploading && <p>Загружается...</p>}
+                    {uploadedObjectName && <p>Фото обновлено ✓</p>}
+                </div>
+
+                <div className={styles.formGroup}>
+                    <label>Имя</label>
+                    <input
+                        value={form.first_name}
+                        onChange={(e) => setForm({ ...form, first_name: e.target.value })}
+                    />
+                </div>
+
+                <div className={styles.formGroup}>
+                    <label>Фамилия</label>
+                    <input
+                        value={form.last_name}
+                        onChange={(e) => setForm({ ...form, last_name: e.target.value })}
+                    />
+                </div>
+
+                {/* Добавь остальные поля по аналогии: отчество, телефон, email, адрес, bio и т.д. */}
             </Modal>
 
-            {/* LOGOUT MODAL */}
+            {/* Модалка выхода */}
             <Modal
                 isOpen={isLogoutOpen}
                 onClose={() => setIsLogoutOpen(false)}
-                title="Выход"
+                title="Выход из аккаунта"
                 footer={
                     <>
                         <Button variant="secondary" onClick={() => setIsLogoutOpen(false)}>
@@ -188,10 +199,10 @@ export const MasterProfile = () => {
                     </>
                 }
             >
-                Вы уверены, что хотите выйти?
+                <p>Вы действительно хотите выйти?</p>
             </Modal>
 
-            <Navigation role={user.role} />
+            <Navigation role="master" />
         </div>
     );
 };

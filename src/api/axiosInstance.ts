@@ -29,7 +29,7 @@ instance.interceptors.response.use(
         if (error.response?.status === 401) {
             console.warn("Access token недействителен, очищаем и редиректим на логин");
             await removeTokens();
-            window.location.href = "/login";
+            window.location.href = "/client";
         }
         return Promise.reject(error);
     },
