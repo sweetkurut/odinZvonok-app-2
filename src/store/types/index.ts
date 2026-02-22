@@ -199,7 +199,7 @@ export type Master = {
     profile_photo_url?: string;
 };
 
-export type MasterStatus = "AVAILABLE" | "ON_CALL" | "ON_BREAK" | "LAST_CALL";
+export type MasterStatus = "AVAILABLE" | "ON_CALL" | "ON_BREAK" | "LAST_CALL" | "OFFLINE";
 
 export type MasterProfile = {
     id: string;

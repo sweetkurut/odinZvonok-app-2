@@ -1,7 +1,72 @@
 .profilePage {
     min-height: 100vh;
-    // padding-bottom: 90px;
+    padding-bottom: 90px;
     // background: #f6f7f9;
+}
+
+
+.fileUpload {
+    position: relative;
+    margin-bottom: 12px;
+
+    input[type="file"] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .fileUploadLabel {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        background: var(--primary-color, #4CAF50);
+        color: white;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s;
+
+        &:hover:not(:disabled) {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    }
+}
+
+.uploadProgress {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    color: #666;
+}
+
+.successMessage {
+    color: #2e7d32;
+    font-weight: 500;
+    margin-top: 8px;
+}
+
+.infoMessage {
+    color: #666;
+    margin-top: 8px;
+}
+
+.spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 .header {

@@ -1,111 +1,156 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import instance from "@/api/axiosInstance"; // ваш настроенный instance
 
-import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/toolkit";
-import axios from "axios";
-
-interface UploadUrlResponse {
-    uploadUrl: string;
+interface UploadFormResponse {
+    url: string;
+    fields: Record<string, string>;
     objectName: string;
 }
 
-interface FilesState {
-    orderImageUploadUrl: string | null;
-    orderAccessUrl: string | null;
-    avatarUploadUrl: string | null;
-    avatarObjectName: string | null;
+interface DownloadUrlResponse {
+    downloadUrl: string;
+}
 
+interface FilesState {
+    avatarUploadMeta: {
+        url: string | null;
+        fields: Record<string, string> | null;
+        objectName: string | null;
+    };
+    avatarDownloadUrl: string | null;
     loading: boolean;
     error: string | null;
-    lastOperation: "idle" | "pending" | "succeeded" | "failed";
 }
 
 const initialState: FilesState = {
-    orderImageUploadUrl: null,
-    orderAccessUrl: null,
-    avatarUploadUrl: null,
-    avatarObjectName: null,
+    avatarUploadMeta: {
+        url: null,
+        fields: null,
+        objectName: null,
+    },
+    avatarDownloadUrl: null,
     loading: false,
     error: null,
-    lastOperation: "idle",
 };
 
-export const getOrderImageUploadUrl = createAsyncThunk<UploadUrlResponse, void, { rejectValue: string }>(
-    "files/getOrderImageUploadUrl",
-    async (_, { rejectWithValue }) => {
+export const getAvatarUploadMeta = createAsyncThunk<
+    UploadFormResponse,
+    { extension: string },
+    { rejectValue: string }
+>("files/getAvatarUploadMeta", async ({ extension }, { rejectWithValue }) => {
+    try {
+        console.log("🔵 Sending POST to upload-form...");
+
+        // ВАЖНО: убираем /api/, так как оно уже есть в baseURL
+        const response = await instance.post<UploadFormResponse>(
+            `/files/upload-form/avatar?extension=${extension}`,
+            {}, // пустое тело
+            {
+                headers: {
+                    accept: "*/*",
+                    "Content-Type": "application/json",
+                },
+            },
+        );
+
+        console.log("🟢 Response status:", response.status);
+        console.log("🟢 Response data:", response.data);
+
+        if (!response.data.url) {
+            console.error("❌ URL отсутствует в ответе!");
+            throw new Error("Server response missing 'url' field");
+        }
+
+        return response.data;
+    } catch (err: any) {
+        console.error("❌ Error details:", {
+            message: err.message,
+            response: err.response?.data,
+            status: err.response?.status,
+            config: err.config?.url, // посмотрим, какой URL реально вызывался
+        });
+
+        let errorMessage = "Failed to get upload meta";
+        if (err.response?.status === 403) {
+            errorMessage = "Ошибка авторизации (403) - проверьте токен";
+        } else if (err.response?.status === 404) {
+            errorMessage = "URL не найден (404) - проверьте путь";
+        } else if (err.response?.data?.message) {
+            errorMessage = err.response.data.message;
+        } else if (err.message) {
+            errorMessage = err.message;
+        }
+
+        return rejectWithValue(errorMessage);
+    }
+});
+
+export const getAvatarDownloadUrl = createAsyncThunk<string, string, { rejectValue: string }>(
+    "files/getAvatarDownloadUrl",
+    async (objectName, { rejectWithValue }) => {
         try {
-            const response = await axios.post<UploadUrlResponse>("/api/files/upload-url/order-image");
-            return response.data;
+            const response = await instance.get<DownloadUrlResponse>(`/files/download-url`, {
+                params: { objectName },
+                headers: {
+                    accept: "*/*",
+                },
+            });
+            return response.data.downloadUrl;
         } catch (err: any) {
             return rejectWithValue(
-                err.response?.data?.message || "Не удалось получить URL для изображения заказа",
+                err.response?.data?.message || err.message || "Failed to get download URL",
             );
         }
     },
 );
 
-export const getAvatarUploadUrl = createAsyncThunk<UploadUrlResponse, string, { rejectValue: string }>(
-    "files/getAvatarUploadUrl",
-    async (extension, { rejectWithValue }) => {
-        try {
-            const res = await axios.post<UploadUrlResponse>(
-                `/api/files/upload-url/avatar?extension=${extension}`,
-            );
-            return res.data;
-        } catch {
-            return rejectWithValue("Не удалось получить upload URL");
-        }
-    },
-);
-
-const fileSlice = createSlice({
+const filesSlice = createSlice({
     name: "files",
     initialState,
     reducers: {
-        clearFilesState(state) {
-            state.orderImageUploadUrl = null;
-            state.orderAccessUrl = null;
-            state.avatarUploadUrl = null;
-            state.avatarObjectName = null;
-            state.error = null;
+        clearAvatarUploadMeta: (state) => {
+            state.avatarUploadMeta = { url: null, fields: null, objectName: null };
         },
-        clearError(state) {
+        clearAvatarDownloadUrl: (state) => {
+            state.avatarDownloadUrl = null;
+        },
+        clearError: (state) => {
             state.error = null;
         },
     },
     extraReducers: (builder) => {
         builder
-            .addCase(getOrderImageUploadUrl.pending, (state) => {
+            .addCase(getAvatarUploadMeta.pending, (state) => {
                 state.loading = true;
                 state.error = null;
-                state.lastOperation = "pending";
             })
-            .addCase(getOrderImageUploadUrl.fulfilled, (state, action: PayloadAction<UploadUrlResponse>) => {
+            .addCase(getAvatarUploadMeta.fulfilled, (state, action) => {
                 state.loading = false;
-                state.orderImageUploadUrl = action.payload.uploadUrl;
-                state.orderAccessUrl = action.payload.accessUrl;
-                state.lastOperation = "succeeded";
+                state.avatarUploadMeta = {
+                    url: action.payload.url,
+                    fields: action.payload.fields,
+                    objectName: action.payload.objectName,
+                };
             })
-            .addCase(getOrderImageUploadUrl.rejected, (state, action) => {
+            .addCase(getAvatarUploadMeta.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.payload as string;
-                state.lastOperation = "failed";
-            });
-
-        builder
-            .addCase(getAvatarUploadUrl.pending, (state) => {
+                state.error = action.payload || "Upload meta error";
+            })
+            .addCase(getAvatarDownloadUrl.pending, (state) => {
                 state.loading = true;
+                state.error = null;
             })
-            .addCase(getAvatarUploadUrl.fulfilled, (state, action: PayloadAction<UploadUrlResponse>) => {
+            .addCase(getAvatarDownloadUrl.fulfilled, (state, action) => {
                 state.loading = false;
-                state.avatarUploadUrl = action.payload.uploadUrl;
-                state.avatarObjectName = action.payload.objectName;
+                state.avatarDownloadUrl = action.payload;
             })
-            .addCase(getAvatarUploadUrl.rejected, (state, action) => {
+            .addCase(getAvatarDownloadUrl.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.payload || "Ошибка";
+                state.error = action.payload || "Download URL error";
             });
     },
 });
 
-export const { clearFilesState } = fileSlice.actions;
-export default fileSlice.reducer;
+export const { clearAvatarUploadMeta, clearAvatarDownloadUrl, clearError } = filesSlice.actions;
+export default filesSlice.reducer;

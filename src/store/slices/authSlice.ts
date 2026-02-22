@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import type { IRefreshTokenResponse, IUpdateProfileRequest } from "../types";
+import type { IRefreshTokenResponse } from "../types";
 import { storesApi } from "@/api";
 
 // Интерфейс пользователя из ответа /auth/telegram
@@ -111,22 +111,24 @@ export const fetchRefreshToken = createAsyncThunk<IRefreshTokenResponse, void, {
 
 export const completeRegistration = createAsyncThunk(
     "auth/completeRegistration",
-    async (
-        data: {
-            first_name: string;
-            last_name: string;
-            middle_name?: string;
-            phone_number: string;
-            email?: string;
-            address?: string;
-            profile_photo_url: string;
-        },
-        { rejectWithValue },
-    ) => {
+    async (data: any, { rejectWithValue }) => {
         try {
+            console.log("🔵 Sending to /auth/complete-registration:", {
+                url: "/auth/complete-registration",
+                data: data,
+                dataType: typeof data,
+                keys: Object.keys(data),
+            });
+
             const res = await storesApi.completeRegistration(data);
+            console.log("🟢 Response:", res.data);
             return res.data;
         } catch (e: any) {
+            console.error("❌ Complete registration error:", {
+                status: e.response?.status,
+                data: e.response?.data,
+                message: e.message,
+            });
             return rejectWithValue(e.response?.data?.message || "Ошибка завершения регистрации");
         }
     },

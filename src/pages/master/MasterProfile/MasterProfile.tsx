@@ -7,7 +7,7 @@ import styles from "./MasterProfile.module.scss";
 import Logo from "../../../assets/Logo.png";
 import { Link, useNavigate } from "react-router-dom";
 import { Modal } from "@/shared/ui/Modal";
-import { getAvatarUploadUrl } from "@/store/slices/filesSlice";
+import { getAvatarUploadMeta, getAvatarUploadUrl } from "@/store/slices/filesSlice";
 import axios from "axios";
 import { ProfileSkeleton } from "@/shared/ui/ProfileSkeleton/ProfileSkeleton";
 
@@ -63,7 +63,7 @@ export const MasterProfile = () => {
         const ext = file.name.split(".").pop();
         setUploading(true);
         try {
-            const uploadData = await dispatch(getAvatarUploadUrl(ext!)).unwrap();
+            const uploadData = await dispatch(getAvatarUploadMeta(ext!)).unwrap();
             await axios.put(uploadData.uploadUrl, file, { headers: { "Content-Type": file.type } });
             setUploadedObjectName(uploadData.objectName);
         } catch {

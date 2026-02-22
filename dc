@@ -1,0 +1,155 @@
+[33mcommit 9d6f3f85209ca8f1c57b1278f85d360f9a112c79[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: sweetkurut <devxwc@gmail.com>
+Date:   Sun Feb 1 21:17:45 2026 +0600
+
+    fix
+
+[33mcommit d19e7cb823ef65545d90eb10879ef2cd1fed173f[m
+Author: sweetkurut <devxwc@gmail.com>
+Date:   Fri Jan 30 18:07:06 2026 +0600
+
+    fix
+
+[33mcommit 38ccc3bca5f1f4a6d4e881a75287654bdc2dc6ee[m
+Author: sweetkurut <devxwc@gmail.com>
+Date:   Thu Jan 29 23:24:00 2026 +0600
+
+    fix user role
+
+[33mcommit 3abcd40122161b491f065ce187574542071c7024[m
+Author: sweetkurut <devxwc@gmail.com>
+Date:   Thu Jan 29 09:40:32 2026 +0600
+
+    add reviews page in masters pages
+
+[33mcommit 08d8de8920700145ee24c523d8a72f5acbe32f82[m
+Author: sweetkurut <devxwc@gmail.com>
+Date:   Mon Jan 26 23:32:45 2026 +0600
+
+    add new pages, prepared
+
+[33mcommit 1b281b88047ae816cf4475d882f66089b50bc3bd[m
+Author: sweetkurut <devxwc@gmail.com>
+Date:   Sun Jan 25 17:30:22 2026 +0600
+
+    add masterslist page
+
+[33mcommit 128299260c6fdcfced1abbef924b5604a81428fa[m
+Author: sweetkurut <devxwc@gmail.com>
+Date:   Sun Jan 25 14:03:17 2026 +0600
+
+    add skeleton for orderpage operator
+
+[33mcommit 43bdb4a112194a62e7a410bc8eec837ec52d1664[m
+Author: sweetkurut <devxwc@gmail.com>
+Date:   Sun Jan 25 13:58:26 2026 +0600
+
+    add master slice, get orders for operators
+
+[33mcommit 0233c9aad99da466a8380328380711a90b8e807d[m
+Author: sweetkurut <devxwc@gmail.com>
+Date:   Fri Jan 23 23:28:49 2026 +0600
+
+    prepared master and operator page
+
+[33mcommit 3a488fa07ee21de9602b0779772764471ec55eb0[m
+Author: sweetkurut <devxwc@gmail.com>
+Date:   Fri Jan 23 16:14:08 2026 +0600
+
+    fix navigation routing
+
+[33mcommit de5aef2dbafb8ac44ae25be93d6d7240bcf855a1[m
+Author: sweetkurut <devxwc@gmail.com>
+Date:   Fri Jan 23 12:49:56 2026 +0600
+
+    add help page
+
+[33mcommit f9328a98cb7467bc4a0284e27290a168d63c44a7[m
+Author: sweetkurut <devxwc@gmail.com>
+Date:   Fri Jan 23 12:43:15 2026 +0600
+
+    fix skelton
+
+[33mcommit f3363fe16911b25f7738190b8f76ff93a28300aa[m
+Author: sweetkurut <devxwc@gmail.com>
+Date:   Fri Jan 23 12:38:33 2026 +0600
+
+    add skeketon loader, add new requests, servies
+
+[33mcommit 59149b6f14347677bdcfc5ce86267594f29e5d65[m
+Author: sweetkurut <devxwc@gmail.com>
+Date:   Wed Jan 14 00:58:37 2026 +0600
+
+    fix styles, fix cards, menu navs
+
+[33mcommit b20b2a94ad2a5bd8e0a144dbaaec795d28056c16[m
+Author: sweetkurut <devxwc@gmail.com>
+Date:   Tue Jan 13 23:36:32 2026 +0600
+
+    fix auth, change ui profile page
+
+[33mcommit 7699b6bee1d2965a6c6f8c2d61390fa670eea9ef[m
+Author: sweetkurut <devxwc@gmail.com>
+Date:   Fri Jan 9 16:25:26 2026 +0600
+
+    fix
+
+[33mcommit 8d211f8102c2d8243290bfca73521556642bb199[m
+Author: sweetkurut <devxwc@gmail.com>
+Date:   Sat Jan 3 13:22:02 2026 +0600
+
+    fix xz
+
+[33mcommit 81891147b56a0161677542d3308c6bb91ea0d78d[m
+Author: sweetkurut <devxwc@gmail.com>
+Date:   Fri Jan 2 00:03:25 2026 +0600
+
+    connect with tg web app
+
+[33mcommit f059c64c78baa5f7578b718dfb906f326c433801[m
+Author: sweetkurut <devxwc@gmail.com>
+Date:   Sun Dec 7 22:48:38 2025 +0600
+
+    dzz
+
+[33mcommit 66e822b9ef903ba3fe164809ca846d57bde04547[m
+Author: sweerkurut <devxwc@gmail.com>
+Date:   Sat Nov 29 12:09:08 2025 +0600
+
+    wqdqwd
+
+[33mcommit 2b9306e0cc823ab7e008d437f15d38717d04dee4[m
+Author: sweetkurut <devxwc@gmail.com>
+Date:   Wed Nov 12 22:13:54 2025 +0600
+
+    fix
+
+[33mcommit 34f76749f92b21583b214c1eea21ab89dbdce271[m
+Author: sweetkurut <devxwc@gmail.com>
+Date:   Sat Nov 1 21:04:17 2025 +0600
+
+    add redux service for orders endpoint
+
+[33mcommit 3023aa2047b74b3bff426f9ca28435ad8742eaee[m
+Author: sweetkurut <devxwc@gmail.com>
+Date:   Sat Nov 1 20:34:42 2025 +0600
+
+    prepared store, services for connecting backend
+
+[33mcommit 299c59d4b0c793072bcc9573dba26171e01d5e19[m
+Author: sweetkurut <devxwc@gmail.com>
+Date:   Wed Oct 29 18:33:26 2025 +0600
+
+    fix styles button, fix bugs in some components
+
+[33mcommit 42327031c4ff5860a39fe44953e1e212bb2c8e2c[m
+Author: sweetkurut <devxwc@gmail.com>
+Date:   Wed Oct 29 10:41:02 2025 +0600
+
+    fix tabulataion
+
+[33mcommit 8d2e236610c8111176faa729ef7143f495ed76d0[m
+Author: sweetkurut <devxwc@gmail.com>
+Date:   Tue Oct 28 20:38:06 2025 +0600
+
+    create mobile app

@@ -3,6 +3,7 @@ import OrderSlice from "./slices/orderSlice";
 import AuthSlice from "./slices/authSlice";
 import TariffSlice from "./slices/tariffSlice";
 import MasterSlice from "./slices/masterSlice";
+import filesSlice from "./slices/filesSlice";
 
 export const store = configureStore({
     reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
         auth: AuthSlice,
         tariffs: TariffSlice,
         masters: MasterSlice,
+        files: filesSlice,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({

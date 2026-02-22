@@ -20,6 +20,7 @@ import ReviewsPage from "@/pages/master/ReviewsPage/ReviewsPage";
 import { RoleLayout } from "@/RoleLayout";
 import { MasterProfile } from "@/pages/master/MasterProfile/MasterProfile";
 import { HistoryPage } from "@/pages/operator/HistoryPage/HistoryPage";
+import { ProfilePage } from "@/pages/client/ProfilePage/ProfilePage";
 
 export const AppRouter = () => {
     return (
@@ -35,7 +36,7 @@ export const AppRouter = () => {
                 <Route path="/client/tariffs" element={<TariffPage />} />
                 <Route path="/client/history" element={<ClientHistoryPage />} />
                 <Route path="/client/history/:id" element={<DetailOrderPage />} />
-                <Route path="/client/profile" element={<ClientProfilePage />} />
+                <Route path="/client/profile" element={<ProfilePage />} />
                 <Route path="/client/create-order" element={<ClientCreateOrderPage />} />
                 <Route path="/client/tariff" element={<ClientTariffPage />} />
             </Route>
