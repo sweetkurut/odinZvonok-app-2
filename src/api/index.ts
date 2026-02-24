@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type {
+    CompleteRegistrationRequest,
     CreateOrder,
     IFullRegisterRequest,
     IQuickRegisterRequest,
@@ -26,7 +27,7 @@ export const storesApi = {
         return instance.post("/auth/register/full", data);
     },
 
-    completeRegistration(data: IUpdateProfileRequest) {
+    completeRegistration(data: CompleteRegistrationRequest) {
         return instance.post("/auth/complete-registration", data);
     },
 

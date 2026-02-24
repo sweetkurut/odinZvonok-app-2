@@ -134,6 +134,31 @@ export const completeRegistration = createAsyncThunk(
     },
 );
 
+export const updateProfile = createAsyncThunk(
+    "auth/updateProfile",
+    async (data: any, { rejectWithValue }) => {
+        try {
+            console.log("🔵 Sending to /auth/profile:", {
+                url: "/auth/profile",
+                data: data,
+                dataType: typeof data,
+                keys: Object.keys(data),
+            });
+
+            const res = await storesApi.updateProfile(data);
+            console.log("🟢 Response:", res.data);
+            return res.data;
+        } catch (e: any) {
+            console.error("❌ Update profile error:", {
+                status: e.response?.status,
+                data: e.response?.data,
+                message: e.message,
+            });
+            return rejectWithValue(e.response?.data?.message || "Ошибка обновления профиля");
+        }
+    },
+);
+
 // Logout
 export const fetchLogout = createAsyncThunk("auth/logout", async () => {
     try {
@@ -209,7 +234,20 @@ const authSlice = createSlice({
             })
             .addCase(completeRegistration.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.payload || "Ошибка сохранения профиля";
+                state.error = action.payload ? String(action.payload) : "Ошибка сохранения профиля";
+            })
+            // updateProfile
+            .addCase(updateProfile.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(updateProfile.fulfilled, (state, action) => {
+                state.loading = false;
+                state.user = action.payload;
+            })
+            .addCase(updateProfile.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload ? String(action.payload) : "Ошибка обновления профиля";
             });
     },
 });

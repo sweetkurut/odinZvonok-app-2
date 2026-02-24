@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Navigation, Card, Button } from "../../../shared/ui";
-import { User, Phone, Mail, Edit, LogOut, Camera, Loader } from "lucide-react";
+import { User, Phone, Mail, Edit, LogOut, Camera, Loader, UserSquare2, MapPin } from "lucide-react";
 import styles from "./ProfilePage.module.scss";
 import Logo from "../../../assets/Logo.png";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/shared/hooks";
 import { useEffect, useState } from "react";
-import { fetchMe, fetchLogout, completeRegistration } from "@/store/slices/authSlice";
+import { fetchMe, fetchLogout, completeRegistration, updateProfile } from "@/store/slices/authSlice";
 import { Modal } from "@/shared/ui/Modal";
 import { getAvatarUploadMeta, getAvatarDownloadUrl, clearAvatarUploadMeta } from "@/store/slices/filesSlice";
 import { ProfileSkeleton } from "@/shared/ui/ProfileSkeleton/ProfileSkeleton";
@@ -39,9 +39,10 @@ export const ProfilePage = () => {
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [isLogoutOpen, setIsLogoutOpen] = useState(false);
     const [uploading, setUploading] = useState(false);
-    const [avatarUrl, setAvatarUrl] = useState<string>(""); // для отображения
+    const [avatarUrl, setAvatarUrl] = useState<string>("");
+    const [avatarLoading, setAvatarLoading] = useState(false);
     const [uploadSuccess, setUploadSuccess] = useState(false);
-    const [isProfileIncomplete, setIsProfileIncomplete] = useState(false);
+    // const [isProfileIncomplete, setIsProfileIncomplete] = useState(false);
 
     const displayName = user
         ? `${user.first_name || ""} ${user.last_name || ""} ${user.middle_name || ""}`.trim()
@@ -57,31 +58,6 @@ export const ProfilePage = () => {
         address: "",
     });
 
-    // Функция для извлечения objectName из полного URL MinIO
-    const extractObjectNameFromUrl = (url: string): string => {
-        if (!url) return "";
-
-        // Если это не URL (уже objectName), возвращаем как есть
-        if (!url.startsWith("http")) return url;
-
-        try {
-            // Паттерн для URL MinIO: https://s3.ismir-kurulush-backend.com.kg/zvonok/avatars/filename.jpg
-            const match = url.match(/\/zvonok\/(.+)$/);
-            if (match && match[1]) {
-                return match[1]; // "avatars/fdf07c2f-1dea-43db-847d-eb7224452b9a.jpg"
-            }
-
-            // Если это Telegram URL (как в примере), возвращаем пустую строку
-            if (url.includes("t.me")) {
-                return "";
-            }
-        } catch (e) {
-            console.error("Ошибка извлечения objectName:", e);
-        }
-
-        return "";
-    };
-
     // Загружаем профиль при монтировании
     useEffect(() => {
         if (!user && !loading) {
@@ -89,39 +65,43 @@ export const ProfilePage = () => {
         }
     }, [dispatch, user, loading]);
 
-    // Загружаем временную ссылку для аватара, если у пользователя есть objectName
+    // Загружаем временную ссылку для аватара
     useEffect(() => {
         const loadAvatarUrl = async () => {
-            const objectName = user?.profile_photo_url;
-            if (!objectName) {
+            const photoUrl = user?.profile_photo_url;
+            if (!photoUrl) {
                 setAvatarUrl("");
                 return;
             }
+
+            setAvatarLoading(true);
             try {
-                const url = await dispatch(getAvatarDownloadUrl(objectName)).unwrap();
-                setAvatarUrl(url + `?t=${Date.now()}`); // кеш-бастер
+                // Если это objectName, получаем presigned URL
+                if (!photoUrl.startsWith("http")) {
+                    const url = await dispatch(getAvatarDownloadUrl(photoUrl)).unwrap();
+                    setAvatarUrl(url + "?t=" + Date.now());
+                } else {
+                    // Если это уже URL, используем как есть
+                    setAvatarUrl(photoUrl + "?t=" + Date.now());
+                }
             } catch (e) {
-                console.error("Не удалось загрузить аватар", e);
+                console.error("Ошибка загрузки аватара:", e);
                 setAvatarUrl("");
+            } finally {
+                setAvatarLoading(false);
             }
         };
+
         loadAvatarUrl();
     }, [user?.profile_photo_url, dispatch]);
 
     // Заполняем форму при открытии модалки
-    // Заполняем форму при открытии модалки
     useEffect(() => {
         if (isEditOpen && user) {
-            // Извлекаем objectName из URL, который приходит с бэкенда
-            const photoObjectName = extractObjectNameFromUrl(user.profile_photo_url || "");
-
-            console.log("Заполняем форму из user:", {
-                original_url: user.profile_photo_url,
-                extracted_objectName: photoObjectName,
-            });
+            console.log("Заполняем форму из user:", user);
 
             setForm({
-                profile_photo_url: photoObjectName,
+                profile_photo_url: user.profile_photo_url ?? "",
                 first_name: user.first_name ?? "",
                 last_name: user.last_name ?? "",
                 middle_name: user.middle_name ?? "",
@@ -129,10 +109,21 @@ export const ProfilePage = () => {
                 email: user.email ?? "",
                 address: user.address ?? "",
             });
+
             setUploadSuccess(false);
             dispatch(clearAvatarUploadMeta());
         }
     }, [isEditOpen, user, dispatch]);
+
+    const handleChange = (key: keyof Omit<ProfileForm, "profile_photo_url">, value: string) => {
+        setForm((prev) => ({ ...prev, [key]: value }));
+    };
+
+    const getFullPhotoUrl = (objectName: string): string => {
+        if (!objectName) return "";
+        if (objectName.startsWith("http")) return objectName;
+        return `https://s3.ismir-kurulush-backend.com.kg/zvonok/${objectName}`;
+    };
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -140,77 +131,40 @@ export const ProfilePage = () => {
 
         try {
             setUploading(true);
-
             const extension = file.name.split(".").pop()?.toLowerCase() || "jpg";
 
-            console.log("🔵 1. Getting upload meta for extension:", extension);
             const meta = await dispatch(getAvatarUploadMeta({ extension })).unwrap();
 
-            console.log("🟢 2. Meta received:", {
-                url: meta.url,
-                fieldsCount: Object.keys(meta.fields).length,
-                objectName: meta.objectName,
-            });
-
-            // СОЗДАЁМ FORM DATA
             const fd = new FormData();
-
-            // Добавляем ВСЕ поля из meta.fields
-            Object.entries(meta.fields).forEach(([key, value]) => {
-                fd.append(key, value);
-                console.log(`   Added field: ${key}`);
-            });
-
-            // Добавляем файл
+            Object.entries(meta.fields).forEach(([key, value]) => fd.append(key, value));
             fd.append("file", file);
-            console.log("   Added file:", file.name);
 
-            // ОТПРАВЛЯЕМ В MINIO
-            console.log("🔵 3. Uploading to MinIO URL:", meta.url);
-            const uploadRes = await fetch(meta.url, {
-                method: "POST",
-                body: fd,
-                // НЕ СТАВИМ headers! Браузер сам добавит boundary
-            });
-
-            console.log("🟡 4. MinIO response status:", uploadRes.status);
+            const uploadRes = await fetch(meta.url, { method: "POST", body: fd });
 
             if (!uploadRes.ok) {
-                const errorText = await uploadRes.text();
-                console.error("❌ MinIO error:", errorText);
-                throw new Error(`Upload failed: ${uploadRes.status} ${errorText}`);
+                throw new Error("Upload failed");
             }
 
-            console.log("🟢 5. Upload successful!");
-
-            // СОХРАНЯЕМ OBJECT NAME
+            // Сохраняем objectName в форму
             setForm((prev) => ({ ...prev, profile_photo_url: meta.objectName }));
             setUploadSuccess(true);
 
-            // ПОЛУЧАЕМ DOWNLOAD URL
-            console.log("🔵 6. Getting download URL for:", meta.objectName);
+            // Получаем ссылку для отображения
             const downloadUrl = await dispatch(getAvatarDownloadUrl(meta.objectName)).unwrap();
-            console.log("🟢 7. Download URL:", downloadUrl);
-
             setAvatarUrl(downloadUrl + "?t=" + Date.now());
-
-            alert("✅ Фото успешно загружено!");
         } catch (err: any) {
-            console.error("❌ ERROR in handleFileChange:", err);
-            alert("Ошибка: " + (err.message || "Неизвестная ошибка"));
+            alert("Ошибка загрузки фото: " + err.message);
         } finally {
             setUploading(false);
         }
     };
 
-    // ===== СОХРАНЕНИЕ ПРОФИЛЯ =====
     const handleSaveProfile = async () => {
         if (!form.first_name || !form.last_name || !form.phone_number) {
             alert("Имя, фамилия и телефон обязательны");
             return;
         }
 
-        // Данные для отправки - profile_photo_url уже должен содержать objectName!
         const dataToSend = {
             first_name: form.first_name,
             last_name: form.last_name,
@@ -218,29 +172,25 @@ export const ProfilePage = () => {
             phone_number: form.phone_number,
             email: form.email,
             address: form.address,
-            profile_photo_url: form.profile_photo_url, // ЭТО ДОЛЖЕН БЫТЬ OBJECTNAME!
+            profile_photo_url: getFullPhotoUrl(form.profile_photo_url),
         };
 
-        console.log("🔍 Данные перед отправкой:", dataToSend);
-
-        // Проверяем, что это действительно objectName, а не URL
-        if (dataToSend.profile_photo_url && dataToSend.profile_photo_url.startsWith("http")) {
-            console.error("❌ Ошибка: profile_photo_url содержит URL, а должен содержать objectName!");
-            alert("Ошибка: фото не было загружено через MinIO. Пожалуйста, загрузите фото заново.");
-            return;
-        }
-
         try {
-            const result = await dispatch(completeRegistration(dataToSend)).unwrap();
-            console.log("✅ Профиль сохранён:", result);
+            let result;
+            if (user?.is_registration_complete) {
+                result = await dispatch(updateProfile(dataToSend)).unwrap();
+            } else {
+                result = await dispatch(completeRegistration(dataToSend)).unwrap();
+            }
+
             await dispatch(fetchMe()).unwrap();
             setIsEditOpen(false);
-            alert("✅ Профиль успешно сохранён!");
+            alert("✅ Профиль сохранён!");
         } catch (err: any) {
-            console.error("❌ Ошибка сохранения:", err);
-            alert("Ошибка: " + (err.message || "Не удалось сохранить профиль"));
+            alert("Ошибка сохранения: " + (err.message || "Неизвестная ошибка"));
         }
     };
+
     const handleLogout = async () => {
         try {
             await dispatch(fetchLogout()).unwrap();
@@ -266,14 +216,17 @@ export const ProfilePage = () => {
             <main className={styles.main}>
                 <Card className={styles.userCard}>
                     <div className={styles.userAvatar}>
-                        {filesState.loading ? (
-                            <Loader size={32} className={styles.spinner} />
+                        {avatarLoading || filesState.loading ? (
+                            <div className={styles.avatarLoader}>
+                                <Loader size={32} className={styles.spinner} />
+                            </div>
                         ) : avatarUrl ? (
                             <img
                                 src={avatarUrl}
                                 alt="avatar"
                                 className={styles.avatar}
                                 onError={() => {
+                                    setAvatarUrl("");
                                     if (user?.profile_photo_url) {
                                         dispatch(getAvatarDownloadUrl(user.profile_photo_url))
                                             .unwrap()
@@ -284,16 +237,28 @@ export const ProfilePage = () => {
                             />
                         ) : (
                             <div className={styles.avatarPlaceholder}>
-                                <User size={32} />
+                                <User size={40} />
                             </div>
                         )}
                     </div>
                     <div className={styles.userInfo}>
-                        <h2>{displayName || "Пользователь"}</h2>
-                        <p className={styles.userRole}>{user.role === "client" ? "Клиент" : "Мастер"}</p>
+                        <div>
+                            <h4>{displayName || "Пользователь"}</h4>
+                        </div>
+                        <div>
+                            <p className={styles.userRole}>{user.role}</p>
+                        </div>
                     </div>
                     <Button size="small" variant="secondary" onClick={() => setIsEditOpen(true)}>
-                        Редактировать <Edit size={16} />
+                        {user.is_registration_complete ? (
+                            <>
+                                <Edit size={16} /> Редактировать
+                            </>
+                        ) : (
+                            <>
+                                <UserSquare2 size={16} /> Завершить регистрацию
+                            </>
+                        )}
                     </Button>
                 </Card>
 
@@ -301,25 +266,35 @@ export const ProfilePage = () => {
                     <h3>Контактная информация</h3>
                     {user.phone_number && (
                         <Card className={styles.contactCard}>
-                            <Phone size={18} />
-                            <span>{user.phone_number}</span>
+                            <div className={styles.contactIcon}>
+                                <Phone size={18} />
+                            </div>
+                            <div className={styles.contactInfo}>
+                                <label>Телефон</label>
+                                <span>{user.phone_number}</span>
+                            </div>
                         </Card>
                     )}
                     {user.email && (
                         <Card className={styles.contactCard}>
-                            <Mail size={18} />
-                            <span>{user.email}</span>
+                            <div className={styles.contactIcon}>
+                                <Mail size={18} />
+                            </div>
+                            <div className={styles.contactInfo}>
+                                <label>Email</label>
+                                <span>{user.email}</span>
+                            </div>
                         </Card>
                     )}
                     {user.address && (
                         <Card className={styles.contactCard}>
-                            <span>{user.address}</span>
-                        </Card>
-                    )}
-                    {isProfileIncomplete && (
-                        <Card className={styles.warningCard}>
-                            <p>⚠️ Профиль заполнен не полностью</p>
-                            <Button onClick={() => setIsEditOpen(true)}>Завершить регистрацию</Button>
+                            <div className={styles.contactIcon}>
+                                <MapPin size={18} />
+                            </div>
+                            <div className={styles.contactInfo}>
+                                <label>Адрес</label>
+                                <span>{user.address}</span>
+                            </div>
                         </Card>
                     )}
                 </section>
@@ -334,61 +309,90 @@ export const ProfilePage = () => {
             </main>
 
             {/* Модалка редактирования */}
-            <Modal
-                isOpen={isEditOpen}
-                onClose={() => setIsEditOpen(false)}
-                title="Редактирование профиля"
-                footer={
-                    <>
-                        <Button variant="secondary" onClick={() => setIsEditOpen(false)}>
-                            Отмена
-                        </Button>
-                        <Button onClick={handleSaveProfile} disabled={uploading}>
-                            {uploading ? <Loader size={16} className={styles.spinner} /> : "Сохранить"}
-                        </Button>
-                    </>
-                }
-            >
-                <div className={styles.formGroup}>
-                    <label>Фотография профиля</label>
-                    <div className={styles.fileUpload}>
-                        <input
-                            type="file"
-                            accept=".png,.jpg,.jpeg,.webp"
-                            onChange={handleFileChange}
-                            disabled={uploading}
-                            id="avatar-upload"
-                        />
-                        <label htmlFor="avatar-upload" className={styles.fileUploadLabel}>
-                            <Camera size={18} />
-                            {uploading ? "Загрузка..." : "Выбрать фото"}
-                        </label>
-                    </div>
-                    {uploading && (
-                        <div className={styles.uploadProgress}>
-                            <Loader size={16} className={styles.spinner} />
-                            <span>Загрузка...</span>
-                        </div>
-                    )}
-                    {uploadSuccess && <p className={styles.successMessage}>✓ Фото загружено</p>}
-                    {!uploadSuccess && form.profile_photo_url && (
-                        <p className={styles.infoMessage}>Текущее фото будет использовано</p>
-                    )}
-                </div>
+            <div className={styles.modalContainer}>
+                <Modal
+                    isOpen={isEditOpen}
+                    onClose={() => setIsEditOpen(false)}
+                    title="Редактирование профиля"
+                    footer={
+                        <>
+                            <Button variant="secondary" onClick={() => setIsEditOpen(false)}>
+                                Отмена
+                            </Button>
+                            <Button onClick={handleSaveProfile} disabled={uploading}>
+                                {uploading ? <Loader size={16} className={styles.spinner} /> : "Сохранить"}
+                            </Button>
+                        </>
+                    }
+                >
+                    <div className={styles.formGroup}>
+                        <label>Фотография профиля</label>
 
-                {(Object.keys(LABELS) as (keyof typeof LABELS)[]).map((key) => (
-                    <div key={key} className={styles.formGroup}>
-                        <label>{LABELS[key]}</label>
-                        <input
-                            type={key === "phone_number" ? "tel" : "text"}
-                            value={form[key]}
-                            onChange={(e) => handleChange(key, e.target.value)}
-                            placeholder={`Введите ${LABELS[key].toLowerCase()}`}
-                            disabled={uploading}
-                        />
+                        {/* КРУГЛОЕ превью фото (текущее или новое) */}
+                        <div className={styles.modalPhotoPreview}>
+                            {uploading ? (
+                                <div className={styles.previewLoader}>
+                                    <Loader size={24} className={styles.spinner} />
+                                </div>
+                            ) : form.profile_photo_url ? (
+                                <img
+                                    src={getFullPhotoUrl(form.profile_photo_url)}
+                                    alt="preview"
+                                    className={styles.previewImage}
+                                    onError={(e) => {
+                                        console.log("Ошибка загрузки превью");
+                                        (e.target as HTMLImageElement).style.display = "none";
+                                        // Показываем заглушку
+                                        e.currentTarget.parentElement?.classList.add(styles.noImage);
+                                    }}
+                                />
+                            ) : (
+                                <div className={styles.avatarPlaceholder}>
+                                    <User size={40} />
+                                </div>
+                            )}
+                        </div>
+
+                        <div className={styles.fileUpload}>
+                            <input
+                                type="file"
+                                accept=".png,.jpg,.jpeg,.webp"
+                                onChange={handleFileChange}
+                                disabled={uploading}
+                                id="avatar-upload"
+                            />
+                            <label htmlFor="avatar-upload" className={styles.fileUploadLabel}>
+                                {uploading ? (
+                                    <>
+                                        <Loader size={18} className={styles.spinner} />
+                                        Загрузка...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Camera size={18} />
+                                        {form.profile_photo_url ? "Изменить фото" : "Выбрать фото"}
+                                    </>
+                                )}
+                            </label>
+                        </div>
+
+                        {uploadSuccess && <p className={styles.successMessage}>✓ Фото загружено</p>}
                     </div>
-                ))}
-            </Modal>
+
+                    {(Object.keys(LABELS) as (keyof typeof LABELS)[]).map((key) => (
+                        <div key={key} className={styles.formGroup}>
+                            <label>{LABELS[key]}</label>
+                            <input
+                                type={key === "phone_number" ? "tel" : "text"}
+                                value={form[key]}
+                                onChange={(e) => handleChange(key, e.target.value)}
+                                placeholder={`Введите ${LABELS[key].toLowerCase()}`}
+                                disabled={uploading}
+                            />
+                        </div>
+                    ))}
+                </Modal>
+            </div>
 
             {/* Модалка выхода */}
             <Modal
@@ -406,7 +410,7 @@ export const ProfilePage = () => {
                     </>
                 }
             >
-                <p>Вы уверены, что хотите выйти?</p>
+                <p className={styles.logoutText}>Вы уверены, что хотите выйти?</p>
             </Modal>
 
             <Navigation role="client" />

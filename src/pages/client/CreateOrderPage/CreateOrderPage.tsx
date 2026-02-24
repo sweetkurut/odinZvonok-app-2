@@ -1,48 +1,131 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Navigation, Card, Button } from "../../../shared/ui";
 import { Link, useNavigate } from "react-router-dom";
-import { Camera, MapPin, X } from "lucide-react";
+import { Camera, MapPin, X, Loader } from "lucide-react";
 import styles from "./CreateOrderPage.module.scss";
 import Logo from "../../../assets/Logo.png";
 import { useAppDispatch, useAppSelector } from "@/shared/hooks";
 import { useState } from "react";
 import { createOrder } from "@/store/slices/orderSlice";
+import { getOrderImageUploadUrl } from "@/store/slices/filesSlice";
 
 export const CreateOrderPage = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const { creating, createError } = useAppSelector((state) => state.orders);
+    const filesState = useAppSelector((state) => state.files);
 
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [category, setCategory] = useState("");
     const [address, setAddress] = useState("");
-    const [images, setImages] = useState<File[]>([]);
-    const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+    const [imageUrls, setImageUrls] = useState<string[]>([]); // Здесь будут objectName'ы из MinIO
+    const [previewUrls, setPreviewUrls] = useState<string[]>([]); // Локальные превью для отображения
+    const [uploadingImages, setUploadingImages] = useState<boolean[]>([]); // Статус загрузки для каждого фото
 
-    // Обработка загрузки фото (только для превью)
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) {
-            const files = Array.from(e.target.files);
-            if (images.length + files.length > 5) {
-                alert("Максимум 5 фото");
-                return;
+    // Загрузка фото в MinIO (POST с FormData, как в профиле)
+    const uploadImageToMinIO = async (file: File): Promise<string> => {
+        const extension = file.name.split(".").pop()?.toLowerCase() || "jpg";
+
+        try {
+            // Получаем метаданные для загрузки (URL и fields)
+            const meta = await dispatch(getOrderImageUploadUrl({ extension })).unwrap();
+
+            console.log("📤 Загружаем фото в MinIO:", meta);
+
+            // СОЗДАЁМ FORM DATA
+            const fd = new FormData();
+
+            // Добавляем ВСЕ поля из meta.fields
+            Object.entries(meta.fields).forEach(([key, value]) => {
+                fd.append(key, value);
+            });
+
+            // Добавляем файл последним
+            fd.append("file", file);
+
+            // ОТПРАВЛЯЕМ POST ЗАПРОС (НЕ PUT!)
+            const uploadRes = await fetch(meta.url, {
+                method: "POST",
+                body: fd,
+                // НЕ СТАВИМ headers! Браузер сам добавит boundary
+            });
+
+            if (!uploadRes.ok) {
+                const errorText = await uploadRes.text().catch(() => "");
+                throw new Error(`Upload failed: ${uploadRes.status} ${errorText}`);
             }
 
-            setImages((prev) => [...prev, ...files]);
-
-            files.forEach((file) => {
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                    setPreviewUrls((prev) => [...prev, reader.result as string]);
-                };
-                reader.readAsDataURL(file);
-            });
+            console.log("✅ Фото успешно загружено, objectName:", meta.objectName);
+            return meta.objectName; // Возвращаем objectName для отправки на бэкенд
+        } catch (error) {
+            console.error("❌ Ошибка загрузки фото:", error);
+            throw error;
         }
     };
 
+    // Обработка выбора файлов
+    const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        if (!files) return;
+
+        const newFiles = Array.from(files);
+
+        // Проверка на максимум 5 фото
+        if (imageUrls.length + newFiles.length > 5) {
+            alert("Максимум 5 фото");
+            return;
+        }
+
+        // Добавляем статусы загрузки для новых файлов
+        setUploadingImages((prev) => [...prev, ...newFiles.map(() => true)]);
+
+        // Создаем локальные превью
+        newFiles.forEach((file) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setPreviewUrls((prev) => [...prev, reader.result as string]);
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Загружаем каждый файл в MinIO
+        const uploadPromises = newFiles.map(async (file, idx) => {
+            try {
+                const objectName = await uploadImageToMinIO(file);
+                return { objectName, index: idx };
+            } catch (error) {
+                console.error("Ошибка загрузки файла:", file.name);
+                return null;
+            }
+        });
+
+        const results = await Promise.all(uploadPromises);
+
+        // Обновляем статусы загрузки (все завершены)
+        setUploadingImages((prev) => prev.map(() => false));
+
+        // Добавляем успешно загруженные objectName'ы
+        const successfulUploads = results
+            .filter((result): result is { objectName: string; index: number } => result !== null)
+            .map((result) => result.objectName);
+
+        setImageUrls((prev) => [...prev, ...successfulUploads]);
+
+        // Если есть неудачные загрузки, показываем сообщение
+        if (successfulUploads.length < newFiles.length) {
+            alert(`Загружено ${successfulUploads.length} из ${newFiles.length} фото`);
+        }
+
+        // Очищаем input, чтобы можно было выбрать те же файлы снова
+        e.target.value = "";
+    };
+
+    // Удаление фото
     const removeImage = (index: number) => {
-        setImages((prev) => prev.filter((_, i) => i !== index));
+        setImageUrls((prev) => prev.filter((_, i) => i !== index));
         setPreviewUrls((prev) => prev.filter((_, i) => i !== index));
+        setUploadingImages((prev) => prev.filter((_, i) => i !== index));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -53,24 +136,28 @@ export const CreateOrderPage = () => {
             return;
         }
 
-        // Бэкенд ожидает imageUrls как массив строк (ссылок)
-        // Пока у нас только локальные превью (base64) — отправляем их как есть
-        // В будущем бэкенд должен принимать файлы или ты должен загружать фото отдельно и получать URL
+        // Проверяем, что все фото загружены
+        if (uploadingImages.some((status) => status)) {
+            alert("Дождитесь загрузки всех фото");
+            return;
+        }
+
         const payload = {
             category,
             title,
             description,
             address,
-            imageUrls: previewUrls, // ← отправляем base64 строки (временно, пока бэк не примет файлы)
+            imageUrls: imageUrls, // Отправляем objectName'ы из MinIO
         };
+
+        console.log("📦 Отправка заказа:", payload);
 
         const result = await dispatch(createOrder(payload));
 
         if (createOrder.fulfilled.match(result)) {
-            alert("Заказ успешно создан!");
-            navigate("/client"); // или на страницу истории заказов
+            alert("✅ Заказ успешно создан!");
+            navigate("/client");
         }
-        // Ошибка уже в createError — покажем ниже
     };
 
     return (
@@ -158,7 +245,11 @@ export const CreateOrderPage = () => {
                                         accept="image/*"
                                         multiple
                                         onChange={handleImageChange}
-                                        disabled={creating || images.length >= 5}
+                                        disabled={
+                                            creating ||
+                                            imageUrls.length >= 5 ||
+                                            uploadingImages.some((status) => status)
+                                        }
                                         style={{ display: "none" }}
                                     />
                                 </label>
@@ -167,19 +258,25 @@ export const CreateOrderPage = () => {
                                     {previewUrls.map((url, index) => (
                                         <div key={index} className={styles.previewItem}>
                                             <img src={url} alt={`Превью ${index + 1}`} />
-                                            <button
-                                                type="button"
-                                                onClick={() => removeImage(index)}
-                                                className={styles.removeImage}
-                                                disabled={creating}
-                                            >
-                                                <X size={16} />
-                                            </button>
+                                            {uploadingImages[index] ? (
+                                                <div className={styles.uploadingOverlay}>
+                                                    <Loader size={20} className={styles.spinner} />
+                                                </div>
+                                            ) : (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeImage(index)}
+                                                    className={styles.removeImage}
+                                                    disabled={creating}
+                                                >
+                                                    <X size={16} />
+                                                </button>
+                                            )}
                                         </div>
                                     ))}
                                 </div>
 
-                                {images.length >= 5 && <p className={styles.limitText}>Максимум 5 фото</p>}
+                                {imageUrls.length >= 5 && <p className={styles.limitText}>Максимум 5 фото</p>}
                             </div>
                         </div>
 
@@ -190,10 +287,17 @@ export const CreateOrderPage = () => {
                     {/* Кнопка отправки */}
                     <div className={styles.submitSection}>
                         <Button
-                            // type="submit"
+                            type="submit"
                             variant="primary"
                             size="large"
-                            disabled={creating || !title || !description || !category || !address}
+                            disabled={
+                                creating ||
+                                !title ||
+                                !description ||
+                                !category ||
+                                !address ||
+                                uploadingImages.some((status) => status)
+                            }
                         >
                             {creating ? "Создание..." : "Создать заказ"}
                         </Button>

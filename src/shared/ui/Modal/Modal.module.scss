@@ -17,6 +17,30 @@
     padding: 16px;
     animation: slideUp 0.25s ease;
     padding-bottom: 96px;
+    max-height: 95vh; // Ограничиваем высоту
+    overflow-y: auto; // Включаем вертикальный скролл
+    -webkit-overflow-scrolling: touch; // Плавный скролл на iOS
+    scrollbar-width: thin; // Тонкий скроллбар для Firefox
+    padding: 20px;
+
+    // Стилизация скроллбара для Chrome/Safari
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #94a3b8;
+        border-radius: 10px;
+
+        &:hover {
+            background: #64748b;
+        }
+    }
 }
 
 @keyframes slideUp {
@@ -56,6 +80,7 @@
     margin-top: 16px;
     display: flex;
     gap: 12px;
+    padding-bottom: 60px;
 
     button {
         flex: 1;

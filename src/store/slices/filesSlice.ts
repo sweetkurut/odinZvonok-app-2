@@ -23,6 +23,11 @@ interface FilesState {
     error: string | null;
 }
 
+interface OrderImageUploadResponse {
+    uploadUrl: string;
+    objectName: string;
+}
+
 const initialState: FilesState = {
     avatarUploadMeta: {
         url: null,
@@ -105,6 +110,24 @@ export const getAvatarDownloadUrl = createAsyncThunk<string, string, { rejectVal
     },
 );
 
+// Получить URL для загрузки изображения заказа
+export const getOrderImageUploadUrl = createAsyncThunk<
+    OrderImageUploadResponse,
+    { extension: string },
+    { rejectValue: string }
+>("files/getOrderImageUploadUrl", async ({ extension }, { rejectWithValue }) => {
+    try {
+        const response = await instance.post<OrderImageUploadResponse>(
+            `/api/files/upload-url/order-image?extension=${extension}`,
+        );
+        return response.data; // { uploadUrl, objectName }
+    } catch (err: any) {
+        return rejectWithValue(
+            err.response?.data?.message || "Не удалось получить URL для загрузки изображения",
+        );
+    }
+});
+
 const filesSlice = createSlice({
     name: "files",
     initialState,
@@ -148,6 +171,17 @@ const filesSlice = createSlice({
             .addCase(getAvatarDownloadUrl.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload || "Download URL error";
+            })
+            .addCase(getOrderImageUploadUrl.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getOrderImageUploadUrl.fulfilled, (state) => {
+                state.loading = false;
+            })
+            .addCase(getOrderImageUploadUrl.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || "Order image upload URL error";
             });
     },
 });

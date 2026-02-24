@@ -167,6 +167,17 @@ export interface IFullRegisterRequest {
     profile_photo_url?: string;
 }
 
+export interface CompleteRegistrationRequest {
+    first_name?: string;
+    last_name?: string;
+    middle_name?: string;
+    phone_number?: string;
+    email?: string;
+    address?: string;
+    profile_photo_url?: string;
+}
+
+
 export interface IUpdateProfileRequest {
     first_name?: string;
     last_name?: string;
@@ -176,6 +187,7 @@ export interface IUpdateProfileRequest {
     address?: string;
     profile_photo_url?: string;
 }
+
 
 // тарифы
 export interface Tariff {

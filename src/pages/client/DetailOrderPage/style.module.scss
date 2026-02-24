@@ -1,138 +1,377 @@
 .page {
     min-height: 100vh;
-    // background: #f6f7f9;
-    padding-bottom: 80px;
+    background: #f8fafc;
+    padding-bottom: 90px;
 }
 
 .header {
+    background: white;
     padding: 16px 20px;
-    background: #fff;
-    border-bottom: 1px solid #e5e7eb;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    border-bottom: 1px solid #e2e8f0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+
+    .backLink {
+        display: flex;
+        align-items: center;
+
+        img {
+            height: 32px;
+            width: auto;
+        }
+    }
 
     h1 {
-        font-size: 18px;
+        font-size: 20px;
         font-weight: 600;
+        color: #0f172a;
+        margin: 0;
+    }
+
+    .headerRight {
+        width: 32px;
     }
 }
 
 .main {
-    padding: 16px;
+    padding: 20px;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 16px;
 }
 
-/* статус */
+.mainCard {
+    padding: 20px;
+    border-radius: 20px;
+    background: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.statusWrapper {
+    margin-bottom: 16px;
+}
+
 .status {
-    align-self: flex-start;
+    display: inline-block;
     padding: 6px 14px;
     border-radius: 999px;
     font-size: 13px;
     font-weight: 600;
+
+    &.pending_assignment {
+        background: #fff3e0;
+        color: #f57c00;
+    }
+
+    &.in_progress {
+        background: #e3f2fd;
+        color: #1976d2;
+    }
+
+    &.completed {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    &.cancelled {
+        background: #fdecea;
+        color: #c62828;
+    }
 }
 
-/* основной блок */
-.mainCard {
-    padding: 16px;
-    border-radius: 18px;
+// Стили для галереи
+.gallery {
+    margin-bottom: 20px;
+}
+
+.mainPhoto {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9;
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    margin-bottom: 8px;
+    background: #f1f5f9;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .photoCount {
+        position: absolute;
+        bottom: 12px;
+        right: 12px;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 500;
+        backdrop-filter: blur(4px);
+    }
+}
+
+.thumbnails {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.thumbnail {
+    aspect-ratio: 1;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    background: #f1f5f9;
+    transition: transform 0.2s;
+
+    &:hover {
+        transform: scale(1.05);
+    }
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
+
+.noPhoto {
+    width: 100%;
+    height: 200px;
+    background: #f1f5f9;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: #64748b;
+    font-size: 14px;
+    margin-bottom: 20px;
+
+    svg {
+        color: #94a3b8;
+    }
 }
 
 .title {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 600;
-    margin-bottom: 8px;
+    color: #0f172a;
+    margin: 0 0 16px 0;
 }
 
-.description {
-    font-size: 14px;
-    color: #6b7280;
-    line-height: 1.4;
-    margin-bottom: 14px;
-    text-align: left;
-    margin-top: 10px;
-}
-
-/* мета */
 .meta {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
+    margin-bottom: 20px;
 }
 
 .metaItem {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
+    color: #334155;
     font-size: 14px;
-    color: #374151;
+
+    .metaIcon {
+        color: #3b82f6;
+        flex-shrink: 0;
+    }
 }
 
-/* мастер */
+.description {
+    border-top: 1px solid #e2e8f0;
+    padding-top: 16px;
+
+    h4 {
+        font-size: 15px;
+        font-weight: 600;
+        color: #0f172a;
+        margin: 0 0 8px 0;
+    }
+
+    p {
+        color: #475569;
+        font-size: 14px;
+        line-height: 1.6;
+        margin: 0;
+        white-space: pre-wrap;
+    }
+}
+
 .masterCard {
-    padding: 16px;
-    border-radius: 18px;
+    padding: 20px;
+    border-radius: 20px;
+    background: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .sectionTitle {
-    font-size: 13px;
-    color: #6b7280;
-    margin-bottom: 10px;
-    display: block;
+    font-size: 16px;
+    font-weight: 600;
+    color: #0f172a;
+    margin: 0 0 16px 0;
 }
 
 .master {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
 }
 
 .avatar {
-    width: 42px;
-    height: 42px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
-    background: #e5e7eb;
+    background: #f1f5f9;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 600;
+    color: #3b82f6;
+    overflow: hidden;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    &.avatarFallback {
+        background: #e2e8f0;
+    }
 }
 
-.avatar img {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
+.masterInfo {
+    flex: 1;
 }
 
 .masterName {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 4px;
 }
 
 .masterSub {
-    font-size: 12px;
-    color: #9ca3af;
+    font-size: 13px;
+    color: #64748b;
 }
 
-.pending_assignment {
-    background: #fff3e0;
-    color: #f57c00;
+// Стили для модалки галереи
+.galleryModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.in_progress {
-    background: #e3f2fd;
-    color: #1976d2;
+.modalContent {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.completed {
-    background: #e8f5e9;
-    color: #2e7d32;
+.closeButton {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    backdrop-filter: blur(4px);
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
 }
 
-.cancelled {
-    background: #fdecea;
-    color: #c62828;
+.modalImageContainer {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modalImage {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.navButton {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    backdrop-filter: blur(4px);
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    &.prevButton {
+        left: 16px;
+    }
+
+    &.nextButton {
+        right: 16px;
+    }
+}
+
+.imageCounter {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 14px;
+    backdrop-filter: blur(4px);
+}
+
+.error {
+    text-align: center;
+    padding: 40px 20px;
+    color: #ef4444;
+    font-size: 16px;
 }
